@@ -51,6 +51,10 @@ function applyNotificationLog(kind) {
         showToast(0, 'Already logged strong today.');
         return;
     }
+    if (state.todayStatus === 'failed') {
+        showToast(0, 'You already slipped today. Stay strong tomorrow!');
+        return;
+    }
     showModal('fail');
 }
 
@@ -213,6 +217,10 @@ function recordFailure() {
     state.lastOpenedDate = todayKey();
     const result = recordSlipToday();
     if (!result || !result.applied) {
+        if (state.todayStatus === 'failed') {
+            showToast(0, 'You already slipped today. Stay strong tomorrow!');
+            return;
+        }
         // Stranded 10/10 (logging blocked, never archived) — recover via normal end path.
         if (typeof journeyIsOver === 'function' && journeyIsOver(state)
             && typeof isAwaitingNextJourney === 'function' && !isAwaitingNextJourney()) {

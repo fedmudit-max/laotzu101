@@ -134,7 +134,7 @@ function isFirstSlipOnWallDate(wallDate, calDay) {
     return !(entry && logStatus(entry) === 'slip');
 }
 
-/** 'strong' | 'slip' | null for a wall date — one outcome per day (slip allows multiples). */
+/** 'strong' | 'slip' | null for a wall date — one outcome per day. */
 function getWallDateLogStatus(wallDate) {
     var entry = getDailyLogEntry(wallDate);
     return entry ? logStatus(entry) : null;
@@ -170,11 +170,13 @@ function countLifetimeRelapses() {
         if (!dateKey) return;
         if (seen[dateKey]) return;
         seen[dateKey] = true;
-        n += (entry && typeof entry === 'object' && entry.slipCount)
-            ? Math.max(1, Number(entry.slipCount) || 1)
-            : 1;
+        n++;
     });
     return n;
+}
+
+function nextSlipCount(logDate, calDay) {
+    return 1;
 }
 
 function countLifetimeJourneys() {
@@ -189,14 +191,6 @@ function countLifetimeJourneys() {
         }
     }
     return completed + (archivedCurrent ? 0 : 1);
-}
-
-function nextSlipCount(logDate, calDay) {
-    var prev = getDailyLogEntry(logDate, calDay);
-    if (prev && logStatus(prev) === 'slip') {
-        return (prev.slipCount || 1) + 1;
-    }
-    return 1;
 }
 
 /** todayStatus is calendar-today only — never set from historical logs. */

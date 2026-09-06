@@ -183,7 +183,7 @@ function renderTopStats() {
             `${failures} ${failures === 1 ? 'slip' : 'slips'}`;
         breakdownEl.setAttribute(
             'title',
-            'Journey score = strong days / slips (not calendar days, not streak length)',
+            'Journey score = strong days / slip days (one slip counts per calendar day)',
         );
     }
 
@@ -268,13 +268,8 @@ function renderButtons() {
         successBtn.disabled = true;
         successBtn.classList.remove('logged');
         successBtn.textContent = 'Plan to avoid it next time';
-
-        const ORDINALS = ['', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th'];
-        const count    = state.todayFailCount;
-        failBtn.disabled    = false;
-        failBtn.textContent = count === 0
-            ? '✕ I Slipped'
-            : `✕ I Slipped ${ORDINALS[count] || `${count}th`} time today`;
+        failBtn.disabled = true;
+        failBtn.textContent = 'Slip logged';
 
     } else {
         successBtn.disabled = false;

@@ -18,17 +18,21 @@ const {
 
 test('flow: cold start init heals stranded journey from localStorage', () => {
     const ctx = createKingContext();
-    resetKing(ctx, { today: '2026-06-20' });
+    resetKing(ctx, { today: '2026-06-24' });
+    const start = '2026-06-15';
+    const dailyLog = {};
+    for (let i = 0; i < 10; i++) {
+        const date = ctx.addDaysToKey(start, i);
+        dailyLog[date] = { status: 'slip', day: i + 1, date, slipCount: 1 };
+    }
     putSavedStateInStorage(ctx, {
         attempt: 1,
-        journeyStartDate: '2026-06-10',
-        appStartDate: '2026-06-10',
-        score: { success: 5, failures: 10 },
+        journeyStartDate: start,
+        appStartDate: start,
+        score: { success: 0, failures: 10 },
         pendingNextJourney: false,
         journeyEndedDate: '',
-        dailyLog: {
-            '2026-06-15': { status: 'slip', day: 6, date: '2026-06-15', slipCount: 10 },
-        },
+        dailyLog,
     });
 
     simulateColdStartInit(ctx);
@@ -91,6 +95,23 @@ test('flow: slip today pushes streak segment, freeze UI, and zeroes live streak'
     assert.equal(ctx.isStreakFreezeDay(), true);
     assert.equal(ctx.getDisplayStreak(), 2);
     assert.equal(ctx.getWallDateLogStatus('2026-06-17'), 'slip');
+});
+
+test('flow: second slip same day does not increment journey failures', () => {
+    const ctx = createKingContext();
+    resetKing(ctx, { today: '2026-06-17' });
+    seedJourney(ctx, { today: '2026-06-17', start: '2026-06-15' });
+    ctx.applyStrongDay({ logDate: '2026-06-15', suppressUI: true });
+    ctx.applyStrongDay({ logDate: '2026-06-16', suppressUI: true });
+
+    assert.equal(simulateLogSlipToday(ctx).applied, true);
+    assert.equal(getState(ctx).score.failures, 1);
+    assert.equal(getState(ctx).currentJourneyStreaks.length, 1);
+
+    const repeat = ctx.applySlipDay({ logDate: '2026-06-17' });
+    assert.equal(repeat.applied, false);
+    assert.equal(getState(ctx).score.failures, 1);
+    assert.equal(getState(ctx).currentJourneyStreaks.length, 1);
 });
 
 test('flow: multi-day absence auto-strongs through N-2 then allows today', () => {

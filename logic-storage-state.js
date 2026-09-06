@@ -16,7 +16,7 @@
  * journeyEndedDate    Wall date of 10th slip    Empty unless pendingNextJourney
  * pendingNextJourney  Between journeys          Logging blocked until canBeginNextJourneyToday
  * todayStatus         today only                none | success | failed — never for yesterday
- * todayFailCount      Slips logged today only   Historical slips must not increment this
+ * todayFailCount      1 when today is a slip day (legacy field; one slip per day)
  * currentStreak       Live consecutive strong   Always recompute from dailyLog (not tap order)
  * longestStreak       All-time streak peak
  * score.success/fail  Journey strong / slips    Permanent bestJourney writes only at 10 slips

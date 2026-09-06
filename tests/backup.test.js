@@ -125,18 +125,22 @@ test('restore pipeline: stale currentStreak recomputed from dailyLog', () => {
 
 test('restore pipeline: stranded 10-slip journey healed', () => {
     const ctx = createKingContext();
-    resetKing(ctx, { today: '2026-06-20' });
+    resetKing(ctx, { today: '2026-06-24' });
+    const start = '2026-06-15';
+    const dailyLog = {};
+    for (let i = 0; i < 10; i++) {
+        const date = ctx.addDaysToKey(start, i);
+        dailyLog[date] = { status: 'slip', day: i + 1, date, slipCount: 1 };
+    }
     runRestorePipeline(ctx, {
         attempt: 1,
-        journeyStartDate: '2026-06-10',
-        appStartDate: '2026-06-10',
-        lastOpenedDate: '2026-06-15',
-        score: { success: 5, failures: 10 },
+        journeyStartDate: start,
+        appStartDate: start,
+        lastOpenedDate: '2026-06-24',
+        score: { success: 0, failures: 10 },
         pendingNextJourney: false,
         journeyEndedDate: '',
-        dailyLog: {
-            '2026-06-15': { status: 'slip', day: 6, date: '2026-06-15', slipCount: 10 },
-        },
+        dailyLog,
     });
 
     const s = getState(ctx);

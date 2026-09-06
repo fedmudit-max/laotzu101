@@ -553,7 +553,7 @@ function renderMonthGrid() {
         dateInfo[dateKey] = { status, slipCount };
     });
 
-    // Counts for the month being viewed (strong days + total slips, multi-slip days add up).
+    // Counts for the month being viewed (strong days + slip days).
     var monthPrefix = year + '-' + String(month + 1).padStart(2, '0') + '-';
     var monthStrong = 0;
     var monthSlips = 0;
@@ -561,7 +561,7 @@ function renderMonthGrid() {
         if (dateKey.indexOf(monthPrefix) !== 0) return;
         var info = dateInfo[dateKey];
         if (info.status === 'strong') monthStrong++;
-        else if (info.status === 'slip') monthSlips += (info.slipCount || 1);
+        else if (info.status === 'slip') monthSlips++;
     });
     var strongEl = document.getElementById('monthStrongStat');
     var slipEl = document.getElementById('monthSlipStat');
@@ -600,7 +600,6 @@ function renderMonthGrid() {
         const info     = dateInfo[key];
         const isSlip   = !!(info && info.status === 'slip');
         const isStrong = !!(info && info.status === 'strong');
-        const daySlips = (info && info.slipCount) || 0;
 
         let cls = 'month-cell';
         if (isFuture) {
@@ -608,7 +607,7 @@ function renderMonthGrid() {
         } else if (beforeStart) {
             cls += ' pre-journey';
         } else if (isSlip) {
-            cls += ' slip' + (daySlips > 1 ? ' slip-multi' : '');
+            cls += ' slip';
         } else if (isStrong) {
             cls += ' strong';
         } else {
@@ -616,11 +615,7 @@ function renderMonthGrid() {
         }
         if (isToday && !beforeStart) cls += ' today';
 
-        const slipBadge = isSlip && daySlips > 1
-            ? `<span class="month-slip-count">×${daySlips}</span>`
-            : '';
-
-        html += `<div class="${cls}"><span class="month-cell-day">${d}</span>${slipBadge}</div>`;
+        html += `<div class="${cls}"><span class="month-cell-day">${d}</span></div>`;
     }
 
     grid.innerHTML = html;

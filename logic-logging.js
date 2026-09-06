@@ -98,6 +98,10 @@ function applySlipDay({ logDate, calDay }) {
         return { applied: false, failures: state.score.failures };
     }
 
+    if (getWallDateLogStatus(wallDate) === 'slip') {
+        return { applied: false, failures: state.score.failures };
+    }
+
     const isToday = wallDate === todayKey();
     const firstSlipOfDay = isFirstSlipOnWallDate(wallDate, calDay);
     const ended = streakSegmentBeforeSlipOnDate(wallDate, firstSlipOfDay);
@@ -116,11 +120,11 @@ function applySlipDay({ logDate, calDay }) {
         status: 'slip',
         day: calDay,
         date: wallDate,
-        slipCount: nextSlipCount(wallDate, calDay),
+        slipCount: 1,
     });
 
     if (isToday) {
-        state.todayFailCount++;
+        state.todayFailCount = 1;
         markTodayStatus(wallDate, 'failed');
     }
     recomputeCurrentStreak();

@@ -28,19 +28,34 @@ function migrateLongestStreakAtStart(merged, saved) {
     return 0;
 }
 
-function syncTodaySlipCountInLog(s) {
-    if (s.todayStatus !== 'failed' || s.todayFailCount < 2) return;
-    const dateKey = s.lastOpenedDate || todayKey();
-    var entry = (s.dailyLog && s.dailyLog[dateKey]) || (s.dailyLog && s.dailyLog[dailyLogKey(s.calendarDay)]);
-    if (entry && logStatus(entry) === 'slip') {
-        entry.slipCount = Math.max(entry.slipCount || 1, s.todayFailCount);
+function repairMultiSlipInflation(s) {
+    if (typeof isAwaitingNextJourney === 'function' && isAwaitingNextJourney(s)) return;
+    var log = s.dailyLog || {};
+    var anchor = typeof readJourneyAnchorWallDate === 'function'
+        ? readJourneyAnchorWallDate(s)
+        : (s.journeyStartDate || '');
+    var deflated = 0;
+    Object.keys(log).forEach(function (k) {
+        var entry = log[k];
+        if (!entry || typeof entry !== 'object' || logStatus(entry) !== 'slip') return;
+        var date = entry.date || (/^\d{4}-\d{2}-\d{2}$/.test(k) ? k : '');
+        if (anchor && date && date < anchor) return;
+        var sc = Math.max(1, Number(entry.slipCount) || 1);
+        if (sc > 1) {
+            deflated += sc - 1;
+            entry.slipCount = 1;
+        }
+    });
+    if (deflated > 0 && s.score) {
+        s.score.failures = Math.max(0, (Number(s.score.failures) || 0) - deflated);
     }
+    if ((s.todayFailCount || 0) > 1) s.todayFailCount = 1;
 }
 
 function runStateMigrations(merged, saved) {
     merged.dailyLog = migrateDailyLogToDateKeys(saved.dailyLog || merged.dailyLog);
     merged.longestStreakAtStreakStart = migrateLongestStreakAtStart(merged, saved);
-    syncTodaySlipCountInLog(merged);
+    repairMultiSlipInflation(merged);
 
     // Seed journey/app start dates for saves that predate these fields (load-time ensure).
     if (typeof ensureJourneyAnchorWallDate === 'function') {
