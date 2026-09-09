@@ -138,7 +138,7 @@ const KNOWLEDGE_FACTS = [
     { emoji: '🧬', headline: 'Energy, drive, and confidence are commonly reported after 90 days of abstinence.', body: 'Many people describe more energy and steady mood with time — individual results vary. Keep measuring your Journey.' },
     { emoji: '🎭', headline: 'Real life beats fantasy loops.', body: 'The more you choose presence over escape, the more intimacy and emotion get room to feel real again.' },
     { emoji: '⏰', headline: 'The first three days are the steep climb.', body: 'If you can log through Day 1–3 with honesty, you have already taken the first step of a real Journey.' },
-    { emoji: '🛡️', headline: 'Avoiding triggers is strategy.', body: 'Kings control the board. Know your weak hours, fix the environment, and protect the chances you have left.' },
+    { emoji: '🛡️', headline: 'Avoiding triggers is strategy.', body: 'Kings control the board. Know your weak hours, fix the environment, and protect the slips you have left.' },
     { emoji: '🌙', headline: 'Late night is high risk for most people.', body: 'Tired minds make thinner choices. Phone away, lights down — small rules that save more Journeys than raw willpower.' },
     { emoji: '🦁', headline: 'Every Journey is data, not failure.', body: 'You learn triggers, patterns, and weak points. Journey 3 is smarter than Journey 1. You are not starting over — you are going farther.' },
 ];
