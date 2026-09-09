@@ -574,15 +574,13 @@
     <div class="onboarding-card">
         <div class="onboarding-slide active" id="slide-0">
             <div class="onboarding-body onboarding-log-intro">
-                <p>Didn't watch porn or relapse?<br>→ Tap <button type="button" class="btn-success onboarding-inline-log-btn" tabindex="-1" aria-hidden="true">✓ I STAYED STRONG TODAY</button></p>
-                <p>Watched porn or relapsed?<br>→ Tap <button type="button" class="btn-danger onboarding-inline-log-btn" tabindex="-1" aria-hidden="true">✕ I SLIPPED TODAY</button></p>
+                <p>Didn't watch porn or relapse?<br>→ Tap <button type="button" class="btn-success onboarding-inline-log-btn" tabindex="-1" aria-hidden="true">✓ I STAYED STRONG TODAY</button><br><span class="onboarding-log-effect onboarding-log-effect-strong">Stayed strong → +1 strong day</span></p>
+                <p>Watched porn or relapsed?<br>→ Tap <button type="button" class="btn-danger onboarding-inline-log-btn" tabindex="-1" aria-hidden="true">✕ I SLIPPED TODAY</button><br><span class="onboarding-log-effect onboarding-log-effect-slip">Slipped → uses 1 of your 10 slips</span></p>
             </div>
         </div>
 
         <div class="onboarding-slide" id="slide-1">
             <div class="onboarding-body onboarding-journey-scroll">
-                <p class="onb-journey-intro">A Journey is your total Strong Days against 10 Slips.</p>
-
                 <div class="onb-journey-example-divider">— Example —</div>
 
                 <div class="onb-journey-compare-vertical" aria-label="Example journey improvement">
@@ -591,29 +589,36 @@
                             <p class="onb-journey-compact-line"><span class="onb-journey-compact-label">Journey 1</span> — 30 strong days / 10 slips</p>
                         </div>
                     </div>
-                    <div class="onb-journey-bridge" role="presentation">
-                        <span class="onb-journey-bridge-stem" aria-hidden="true"></span>
-                        <p class="onb-journey-bridge-note">Target: Beat 30 strong days</p>
-                        <span class="onb-journey-bridge-chevron" aria-hidden="true">↓</span>
-                    </div>
                     <div class="onb-journey-step">
+                        <div class="onb-journey-bridge" role="presentation">
+                            <span class="onb-journey-bridge-stem" aria-hidden="true"></span>
+                            <p class="onb-journey-bridge-note">Target: Beat 30 strong days</p>
+                            <span class="onb-journey-bridge-chevron" aria-hidden="true">↓</span>
+                        </div>
                         <div class="onb-journey-block onb-journey-block-better">
                             <p class="onb-journey-compact-line"><span class="onb-journey-compact-label">Journey 2</span> — 50 strong days / 10 slips</p>
                         </div>
                     </div>
-                    <div class="onb-journey-bridge" role="presentation">
-                        <span class="onb-journey-bridge-stem" aria-hidden="true"></span>
-                        <p class="onb-journey-bridge-note onb-journey-bridge-note-gain">+20 Strong Days · You improved.</p>
-                        <span class="onb-journey-bridge-chevron" aria-hidden="true">↓</span>
+                    <div class="onb-journey-step">
+                        <div class="onb-journey-bridge" role="presentation">
+                            <span class="onb-journey-bridge-stem" aria-hidden="true"></span>
+                            <p class="onb-journey-bridge-note onb-journey-bridge-note-gain">+20 days improvement <span class="onb-journey-bridge-note-sub">(Beat: 50 strong days)</span></p>
+                            <span class="onb-journey-bridge-chevron" aria-hidden="true">↓</span>
+                        </div>
+                        <div class="onb-journey-block onb-journey-block-next">
+                            <p class="onb-journey-compact-line"><span class="onb-journey-compact-label">Journey 3</span> — 70 strong days / 10 slips</p>
+                        </div>
                     </div>
                     <div class="onb-journey-step">
+                        <div class="onb-journey-bridge" role="presentation">
+                            <span class="onb-journey-bridge-stem" aria-hidden="true"></span>
+                            <span class="onb-journey-bridge-chevron" aria-hidden="true">↓</span>
+                        </div>
                         <div class="onb-journey-block onb-journey-block-next">
-                            <p class="onb-journey-compact-line"><span class="onb-journey-compact-label">Journey 3</span> — Beat 50 strong days</p>
+                            <p class="onb-journey-compact-line"><span class="onb-journey-compact-label">Journey 4</span> — beat 70 strong days / 10 slips</p>
                         </div>
                     </div>
                 </div>
-
-                <p class="onb-journey-outro">Every Journey gives you a number to beat.</p>
             </div>
         </div>
 

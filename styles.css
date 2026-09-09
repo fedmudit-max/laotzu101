@@ -2998,6 +2998,22 @@ button {
     white-space: nowrap;
 }
 
+.onboarding-log-effect {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.onboarding-log-effect-strong {
+    color: rgba(52, 199, 89, 0.9);
+}
+
+.onboarding-log-effect-slip {
+    color: rgba(60, 60, 67, 0.62);
+}
+
 .onboarding-log-intro p:last-child {
     margin-bottom: 0;
 }
@@ -3038,11 +3054,14 @@ button {
 }
 
 .onb-journey-compare-vertical .onb-journey-step {
-    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    margin: 0;
 }
 
 .onb-journey-compare-vertical .onb-journey-step + .onb-journey-step {
-    margin-top: 12px;
+    margin-top: 0;
 }
 
 .onb-journey-compare-vertical .onb-journey-step > .onb-journey-label {
@@ -3101,18 +3120,21 @@ button {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 2px 0 0;
+    margin: 0;
+    gap: 0;
+    line-height: 1;
 }
 
 .onb-journey-bridge-stem {
     display: block;
     width: 1px;
     height: 10px;
+    margin: 0;
     background: rgba(60, 60, 67, 0.16);
 }
 
 .onb-journey-bridge-note {
-    margin: 5px 0 3px;
+    margin: 4px 0 2px;
     font-size: 11px;
     font-weight: 600;
     line-height: 1.35;
@@ -3125,11 +3147,26 @@ button {
     color: rgba(52, 199, 89, 0.88);
 }
 
+.onb-journey-bridge-note-sub {
+    font-weight: 600;
+    color: rgba(60, 60, 67, 0.55);
+}
+
+.onb-journey-bridge-final {
+    margin-bottom: 0;
+}
+
 .onb-journey-bridge-chevron {
+    display: block;
+    margin: 0;
     font-size: 13px;
     font-weight: 600;
     line-height: 1;
     color: rgba(60, 60, 67, 0.28);
+}
+
+.onb-journey-compare-vertical .onb-journey-step > .onb-journey-bridge + .onb-journey-block {
+    margin-top: 0;
 }
 
 .onb-journey-compare-vertical .onb-journey-block .onb-journey-label {
