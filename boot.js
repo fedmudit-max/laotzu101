@@ -140,8 +140,6 @@ function showFileProtocolBanner() {
             'chart-streaks': function () { switchChartMode('streaks'); },
             'chart-journeys': function () { switchChartMode('journeys'); },
             onboardingNext: onboardingNext,
-            // Skip uses the same finish path as Let's Begin — trial from Calendar Day 1.
-            onboardingSkip: completeOnboarding,
             'yesterday-strong': function () { logYesterday('strong'); },
             'yesterday-slip': function () { logYesterday('slip'); },
             closeCelebration: closeCelebration,

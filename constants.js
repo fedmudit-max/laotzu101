@@ -7,7 +7,6 @@ const MAX_FAILURES = 10;
 const STORAGE_KEY = 'habitTracker_v3';
 const LAST_BACKUP_KEY = 'kingLastBackupAt';
 const URGE_DURATION_SECS = 5 * 60;
-const TOTAL_SLIDES = 5;
 const BACKUP_FORMAT = 'king-backup';
 const BACKUP_VERSION = 1;
 /** Local free trial length. Access window is trialStartedAt + this many days. */

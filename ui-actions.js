@@ -228,18 +228,18 @@ function recordFailure() {
                 ? inferJourneyEndWallDate()
                 : todayKey();
             completeEndJourney(endDay);
-            showToast(0, '10 Powers used. Journey complete.');
+            showToast(0, '10 slips logged. Journey complete.');
         }
         return;
     }
 
     if (journeyIsOver(state)) {
         completeEndJourney(todayKey());
-        showToast(0, '10 Powers used. Journey complete.');
+        showToast(0, '10 slips logged. Journey complete.');
     } else {
         chartPage = -1;
         saveAndRender();
         const failures = result.failures;
-        showToast(0, `${failures} Power${failures === 1 ? '' : 's'} used. Keep moving forward. Journey Continues.`);
+        showToast(0, `${failures} slip${failures === 1 ? '' : 's'} logged. Keep moving forward. Journey continues.`);
     }
 }

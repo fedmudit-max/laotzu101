@@ -23,7 +23,6 @@ let celebrationAutoCloseId = null;
 let urgeSecsLeft  = URGE_DURATION_SECS;
 let urgeInterval   = null;
 let breathTimeout  = null;
-let currentSlide = 0;
 let lastActionTap = { btn: null, action: '', at: 0 };
 let lastJourneyMilestonesKey = '';
 let deferredHeavyRendered = false;
@@ -231,7 +230,7 @@ function renderChances() {
     if (labelEl) {
         labelEl.className = `chances-label ${tier}`;
         labelEl.textContent =
-            `💪 ${remaining} ${remaining === 1 ? 'power' : 'powers'} remaining`;
+            `💪 ${remaining} ${remaining === 1 ? 'chance' : 'chances'} left`;
     }
 }
 
@@ -276,7 +275,7 @@ function renderButtons() {
         successBtn.classList.remove('logged');
         successBtn.textContent = '✓ I STAYED STRONG TODAY';
         failBtn.disabled    = false;
-        failBtn.textContent = '✕ I Slipped';
+        failBtn.textContent = '✕ I SLIPPED TODAY';
     }
 }
 

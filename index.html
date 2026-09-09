@@ -75,16 +75,16 @@
             <div class="score-breakdown" id="currentJourneyBreakdown"></div>
         </div>
 
-        <!-- 10 powers (💪 emojis) -->
+        <!-- 10 chances (💪 emojis) -->
         <div class="chances-card">
             <div class="chances-grid" id="chancesGrid"></div>
-            <div class="chances-label relapse-0" id="chancesLabel">💪 10 powers remaining</div>
+            <div class="chances-label relapse-0" id="chancesLabel">💪 10 chances left</div>
         </div>
 
         <!-- Action buttons -->
         <div class="action-buttons">
             <button class="btn-success" id="successBtn" data-action="success">✓ I STAYED STRONG TODAY</button>
-            <button class="btn-danger"  id="failBtn"    data-action="modal-fail">✕ I Slipped</button>
+            <button class="btn-danger"  id="failBtn"    data-action="modal-fail">✕ I SLIPPED TODAY</button>
             <button class="btn-urge" data-action="urge">🌊 I Feel the Urge</button>
         </div>
     </div>
@@ -380,31 +380,21 @@
 
             <section class="learn-section">
                 <h3 class="learn-section-title">Log Every Day</h3>
-                <p class="learn-section-body">If you didn't watch porn or relapse, tap <span class="learn-log-strong">I Stayed Strong Today</span>.</p>
-                <p class="learn-section-body">When you tap <span class="learn-log-strong">I Stayed Strong</span>, you're not just logging a day.</p>
-                <p class="learn-section-body">You're registering proof.</p>
-                <p class="learn-section-body">Every thought you fought. Every impulse you didn't react to. Every moment you chose differently.</p>
-                <p class="learn-section-body">It counts. It's recorded. It's part of your history.</p>
-
-                <p class="learn-section-body">If you watched porn or relapsed, tap <span class="learn-log-slip">I Slipped</span> once for that day.</p>
-                <p class="learn-section-body">When you tap <span class="learn-log-slip">I Slipped</span>, you're being honest.</p>
-                <p class="learn-section-body">You acknowledge what happened. You take responsibility.</p>
-                <p class="learn-section-body">One slip counts per calendar day on your Journey — log it honest and move on.</p>
-
-                <p class="learn-section-body">It's here to show you the truth — so you can understand where you are, learn from it, and keep moving forward.</p>
+                <p class="learn-section-body">Didn't watch porn or relapse?<br>→ Tap <span class="learn-log-strong">I Stayed Strong Today</span></p>
+                <p class="learn-section-body">Watched porn or relapsed?<br>→ Tap <span class="learn-log-slip">I Slipped Today</span></p>
             </section>
 
             <section class="learn-section">
                 <h3 class="learn-section-title">The Journey System</h3>
                 <p class="learn-section-body"><strong>Don't just count your streak. Measure the Journey.</strong></p>
-                <p class="learn-section-body">Every Journey starts with <strong>10 Powers</strong>.</p>
+                <p class="learn-section-body">Every Journey starts with <strong>10 chances</strong> — up to <strong>10 slip days</strong> before it ends.</p>
                 <p class="learn-section-body">Think of them as something valuable — something you don't want to waste.</p>
-                <p class="learn-section-body">Every time you slip on a new day, <strong>one Power is lost.</strong></p>
-                <p class="learn-powers learn-seq-row" aria-label="Powers countdown">
+                <p class="learn-section-body">Every time you slip on a new day, <strong>you lose one chance.</strong></p>
+                <p class="learn-powers learn-seq-row" aria-label="Chances left countdown">
                     <span class="learn-seq-num learn-pow-ok">10</span><span class="learn-seq-arrow learn-pow-ok" aria-hidden="true">→</span><span class="learn-seq-num learn-pow-ok">9</span><span class="learn-seq-arrow learn-pow-ok" aria-hidden="true">→</span><span class="learn-seq-num learn-pow-warn">8</span><span class="learn-seq-arrow learn-pow-warn" aria-hidden="true">→</span><span class="learn-seq-num learn-pow-warn">7</span><span class="learn-seq-gap learn-pow-warn" aria-hidden="true">.......</span><span class="learn-seq-arrow learn-pow-danger" aria-hidden="true">→</span><span class="learn-seq-num learn-pow-danger">3</span><span class="learn-seq-arrow learn-pow-danger" aria-hidden="true">→</span><span class="learn-seq-num learn-pow-danger">2</span><span class="learn-seq-arrow learn-pow-critical" aria-hidden="true">→</span><span class="learn-seq-num learn-pow-critical">1</span>
                 </p>
-                <p class="learn-section-body">More powers you have, stronger you are. Less powers you have, weaker you are.</p>
-                <p class="learn-section-body">Every time you relapse, you lose one Power — and you feel this:</p>
+                <p class="learn-section-body">More chances you have left, longer you can keep building strong days.</p>
+                <p class="learn-section-body">Every time you relapse, you lose one chance — and you feel this:</p>
                 <blockquote class="learn-quote learn-quote-emphasis">
                     I have lost one. I don't want to lose another.
                 </blockquote>
@@ -421,7 +411,7 @@
                 <p class="learn-score-line learn-seq-row learn-score-example"><span>Streak 3:</span><span>2 days</span><span class="learn-seq-arrow" aria-hidden="true">→</span><span>slip</span><span class="learn-seq-arrow" aria-hidden="true">→</span><span>11 strong / 3 slips</span></p>
                 <p class="learn-score-line learn-seq-row learn-score-example"><span>Streak 4:</span><span>0 days</span><span class="learn-seq-arrow" aria-hidden="true">→</span><span>slip</span><span class="learn-seq-arrow" aria-hidden="true">→</span><span>11 strong / 4 slips</span></p>
                 <p class="learn-section-body">Your strong days accumulate.</p>
-                <p class="learn-section-body">Your Powers count down.</p>
+                <p class="learn-section-body">Your chances left go down.</p>
                 <p class="learn-section-body">Eventually, the Journey ends.</p>
                 <p class="learn-score-line learn-score-example">25 strong days / 10 slips.</p>
                 <p class="learn-section-body">And now you have a number. A number you can understand. A number you can beat.</p>
@@ -526,8 +516,7 @@
                 <h3 class="learn-section-title">What You Need to Do</h3>
                 <p class="learn-section-body">Keep it simple.</p>
                 <p class="learn-section-body"><strong>Record every strong day. Record every slip.</strong></p>
-                <p class="learn-section-body">If you slip once, log it.</p>
-                <p class="learn-section-body">If you slip three times in a day, log all three.</p>
+                <p class="learn-section-body">If you slip, log it once for that day.</p>
                 <p class="learn-section-body">Be honest with numbers.</p>
                 <p class="learn-section-body">They show where you really are.</p>
                 <p class="learn-section-body">Every Journey teaches you something.</p>
@@ -580,72 +569,60 @@
     </div>
 </div>
 
-<!-- ── Onboarding ── -->
+<!-- ── Onboarding (first launch — 2 screens) ── -->
 <div class="onboarding-overlay hidden" id="onboardingOverlay" style="display:none">
     <div class="onboarding-card">
-
-        <!-- Slide 1 — Welcome -->
         <div class="onboarding-slide active" id="slide-0">
-            <div class="onboarding-emoji">👑</div>
-            <div class="onboarding-title">Welcome to King</div>
-            <div class="onboarding-body">This is not another streak app. King is built different—for the long journey, not the perfect streak.</div>
-        </div>
-
-        <!-- Slide 2 — The problem -->
-        <div class="onboarding-slide" id="slide-1">
-            <div class="onboarding-emoji">💔</div>
-            <div class="onboarding-title">Fail Forward, Not Backward</div>
-            <div class="onboarding-body">Most apps reset everything on one slip. King doesn't. A slip is not the end — it's data. You learn, you adjust, you keep moving forward.</div>
-        </div>
-
-        <!-- Slide 3 — The journey system -->
-        <div class="onboarding-slide" id="slide-2">
-            <div class="onboarding-emoji">⚡</div>
-            <div class="onboarding-title">10 Chances Per Journey</div>
-            <div class="onboarding-body">A slip costs a chance — not your journey. You have 10 chances. Use them. Your journey ends only when all 10 are gone. Then a new one begins.</div>
-        </div>
-
-        <!-- Slide 4 — Progress not perfection -->
-        <div class="onboarding-slide" id="slide-3">
-            <div class="onboarding-emoji">📈</div>
-            <div class="onboarding-title">Progress, Not Perfection</div>
-            <div class="onboarding-journey-compare" aria-label="Example journey improvement">
-                <div class="onb-journey-card">
-                    <div class="onb-journey-label">Journey 1</div>
-                    <div class="onb-journey-row"><span>Strong Days</span><strong>25</strong></div>
-                    <div class="onb-journey-row"><span>Relapses</span><strong>10</strong></div>
-                    <div class="onb-journey-row onb-journey-score"><span>Score</span><strong>25</strong></div>
-                </div>
-                <div class="onb-journey-arrow" aria-hidden="true">↓</div>
-                <div class="onb-journey-card onb-journey-card-better">
-                    <div class="onb-journey-label">Journey 2</div>
-                    <div class="onb-journey-row"><span>Strong Days</span><strong>30</strong></div>
-                    <div class="onb-journey-row"><span>Relapses</span><strong>10</strong></div>
-                    <div class="onb-journey-row onb-journey-score"><span>Score</span><strong>30</strong></div>
-                </div>
-                <p class="onb-journey-verdict">You have improved 20%</p>
+            <div class="onboarding-body onboarding-log-intro">
+                <p>Didn't watch porn or relapse?<br>→ Tap <button type="button" class="btn-success onboarding-inline-log-btn" tabindex="-1" aria-hidden="true">✓ I STAYED STRONG TODAY</button></p>
+                <p>Watched porn or relapsed?<br>→ Tap <button type="button" class="btn-danger onboarding-inline-log-btn" tabindex="-1" aria-hidden="true">✕ I SLIPPED TODAY</button></p>
             </div>
         </div>
 
-        <!-- Slide 5 — The destination -->
-        <div class="onboarding-slide" id="slide-4">
-            <div class="onboarding-emoji">🦁</div>
-            <div class="onboarding-title">Become the King</div>
-            <div class="onboarding-body">Strong → Warrior → King. Every day you log is a step. Every urge you resist is proof. The crown isn't given — it's earned. Your journey starts now.</div>
+        <div class="onboarding-slide" id="slide-1">
+            <div class="onboarding-body onboarding-journey-scroll">
+                <p class="onb-journey-intro">A Journey is your total Strong Days against 10 Slips.</p>
+
+                <div class="onb-journey-example-divider">— Example —</div>
+
+                <div class="onb-journey-compare-vertical" aria-label="Example journey improvement">
+                    <div class="onb-journey-step">
+                        <div class="onb-journey-block">
+                            <p class="onb-journey-compact-line"><span class="onb-journey-compact-label">Journey 1</span> — 30 strong days / 10 slips</p>
+                        </div>
+                    </div>
+                    <div class="onb-journey-bridge" role="presentation">
+                        <span class="onb-journey-bridge-stem" aria-hidden="true"></span>
+                        <p class="onb-journey-bridge-note">Target: Beat 30 strong days</p>
+                        <span class="onb-journey-bridge-chevron" aria-hidden="true">↓</span>
+                    </div>
+                    <div class="onb-journey-step">
+                        <div class="onb-journey-block onb-journey-block-better">
+                            <p class="onb-journey-compact-line"><span class="onb-journey-compact-label">Journey 2</span> — 50 strong days / 10 slips</p>
+                        </div>
+                    </div>
+                    <div class="onb-journey-bridge" role="presentation">
+                        <span class="onb-journey-bridge-stem" aria-hidden="true"></span>
+                        <p class="onb-journey-bridge-note onb-journey-bridge-note-gain">+20 Strong Days · You improved.</p>
+                        <span class="onb-journey-bridge-chevron" aria-hidden="true">↓</span>
+                    </div>
+                    <div class="onb-journey-step">
+                        <div class="onb-journey-block onb-journey-block-next">
+                            <p class="onb-journey-compact-line"><span class="onb-journey-compact-label">Journey 3</span> — Beat 50 strong days</p>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="onb-journey-outro">Every Journey gives you a number to beat.</p>
+            </div>
         </div>
 
-        <!-- Dots -->
         <div class="onboarding-dots">
             <div class="onboarding-dot active" id="dot-0"></div>
             <div class="onboarding-dot" id="dot-1"></div>
-            <div class="onboarding-dot" id="dot-2"></div>
-            <div class="onboarding-dot" id="dot-3"></div>
-            <div class="onboarding-dot" id="dot-4"></div>
         </div>
 
-        <!-- Buttons -->
-        <button class="onboarding-next" id="onboardingBtn" data-action="onboardingNext">Next →</button>
-        <button class="onboarding-skip" data-action="onboardingSkip">Skip</button>
+        <button type="button" class="onboarding-next" id="onboardingBtn" data-action="onboardingNext">Next →</button>
     </div>
 </div>
 
