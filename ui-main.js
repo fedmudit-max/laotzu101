@@ -159,6 +159,14 @@ function getRelapseScoreTier(failures) {
     return 'relapse-10';
 }
 
+function renderJourneyScoreMarkup(success, failures) {
+    return (
+        '<span class="score-strong">' + success + '</span>' +
+        '<span class="score-sep">/</span>' +
+        '<span class="score-failures">' + failures + '</span>'
+    );
+}
+
 function renderTopStats() {
     clampCalendarDayToRealToday();
     const dayEl = document.getElementById('calendarDay');
@@ -169,10 +177,7 @@ function renderTopStats() {
     const currentEl = document.getElementById('currentJourney');
     if (currentEl) {
         currentEl.className = `score-value ${tier}`;
-        currentEl.innerHTML =
-            `<span class="score-strong">${success}</span>` +
-            `<span class="score-sep">/</span>` +
-            `<span class="score-failures">${failures}</span>`;
+        currentEl.innerHTML = renderJourneyScoreMarkup(success, failures);
     }
 
     const breakdownEl = document.getElementById('currentJourneyBreakdown');
@@ -188,7 +193,13 @@ function renderTopStats() {
 
     const bestEl = document.getElementById('bestJourney');
     const best = getDisplayBestJourney();
-    if (bestEl) bestEl.textContent = formatJourneyScore(best);
+    if (bestEl) {
+        bestEl.className = 'stat-value gold';
+        bestEl.innerHTML = renderJourneyScoreMarkup(
+            Number(best.success) || 0,
+            Number(best.failures) || 0,
+        );
+    }
 
     const bestHintEl = document.getElementById('bestJourneyHint');
     if (bestHintEl) {

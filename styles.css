@@ -682,10 +682,27 @@ body::before {
     line-height: 1;
     font-variant-numeric: tabular-nums;
     letter-spacing: -1px;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0;
 }
 
 .stat-value.green { font-size: 28px; color: var(--green); }
 .stat-value.gold  { font-size: 30px; color: var(--gold); }
+
+.stat-value.gold .score-strong,
+.stat-value.gold .score-failures {
+    color: var(--gold);
+}
+
+.stat-value.gold .score-sep {
+    margin: 0 0.07em;
+    font-weight: 600;
+    color: var(--gold);
+    background: none;
+    -webkit-text-fill-color: currentColor;
+}
 
 .stat-hint {
     font-size: 10px;
@@ -748,7 +765,7 @@ body::before {
 
 .score-sep {
     font-weight: 600;
-    margin: 0 3px;
+    margin: 0 0.07em;
     color: var(--green);
     -webkit-text-fill-color: transparent;
     -webkit-background-clip: text;
