@@ -213,15 +213,8 @@ function renderPremiumStatus() {
         }
     } else if (Entitlement.isTrialActive()) {
         var trialPhase = getPremiumTrialPanelPhase();
-        var trialLeft = Entitlement.daysRemaining();
         if (titleEl) titleEl.textContent = '⭐ Premium trial';
-        if (teaserEl) {
-            if (trialPhase === 'countdown') {
-                teaserEl.textContent = formatTrialDaysLeft(trialLeft) + ' · see what stays';
-            } else {
-                teaserEl.textContent = formatTrialDaysLeft(trialLeft) + ' · logging always free';
-            }
-        }
+        if (teaserEl) teaserEl.textContent = '';
         if (cardEl) {
             cardEl.classList.add('premium-trial-state');
             cardEl.classList.remove('premium-active-state', 'premium-expired-state');
