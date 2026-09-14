@@ -9,6 +9,8 @@ const LAST_BACKUP_KEY = 'kingLastBackupAt';
 const URGE_DURATION_SECS = 30;
 const BREATH_IN_SECS = 4;
 const BREATH_OUT_SECS = 4;
+/** SVG breath ring arc length (2π × r=54). */
+const BREATH_RING_CIRCUMFERENCE = 339;
 /** Peak gain for urge-surf inhale/exhale breath cue (Web Audio). */
 const BREATH_SOUND_GAIN = 0.75;
 const BACKUP_FORMAT = 'king-backup';

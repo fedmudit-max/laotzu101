@@ -223,7 +223,8 @@ test('warrior unlock hint shows day count on first locked row only', () => {
     const ctx = createKingContext();
     resetKing(ctx, { today: '2026-06-15' });
 
-    assert.equal(ctx.formatJourneyMilestoneUnlockHint(100), '100 Strong Days to unlock');
+    assert.equal(ctx.formatJourneyMilestoneUnlockHint(50), 'Log 50 strong days to unlock');
+    assert.equal(ctx.formatJourneyMilestoneUnlockHint(100), 'Keep going to unlock');
     assert.equal(ctx.formatJourneyMilestoneUnlockHint(200), '200 Strong Days to unlock');
     assert.equal(ctx.formatJourneyMilestoneUnlockHint(400), '400 Strong Days to unlock');
 });

@@ -505,6 +505,8 @@ function formatStrongDaysToWinLabel(dayCount, withExclaim) {
 function formatJourneyMilestoneUnlockHint(unlockAt) {
     var day = Math.max(0, Math.floor(Number(unlockAt) || 0));
     if (day <= 0) return 'Keep going to unlock';
+    if (day === 50) return 'Log 50 strong days to unlock';
+    if (day === 100) return 'Keep going to unlock';
     return formatJourneyMilestoneLabel(day) + ' to unlock';
 }
 
@@ -667,15 +669,18 @@ function buildJourneyMilestoneCelebration(hitDay, s) {
 
 function expandSectionMilestones(sectionDays, options) {
     options = options || {};
+    var alwaysVisibleDays = options.alwaysVisibleDays;
     var out = [];
     for (var i = 0; i < sectionDays.length; i++) {
         var day = sectionDays[i];
         var meta = JOURNEY_MILESTONES[day];
+        var alwaysVisible = options.alwaysVisible
+            || (alwaysVisibleDays && alwaysVisibleDays.indexOf(day) >= 0);
         out.push({
             day: day,
             emoji: meta.emoji,
             label: formatJourneyMilestoneLabel(day),
-            unlockAt: options.alwaysVisible ? 0 : getMilestoneUnlockDay(day),
+            unlockAt: alwaysVisible ? 0 : getMilestoneUnlockDay(day),
         });
     }
     return out;

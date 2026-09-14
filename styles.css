@@ -22,6 +22,8 @@ html.king-loading .container {
 :root {
     --green:       #34c759;
     --green-light: #30d158;
+    /* Slip button — tangerine orange; distinct from Best Journey --gold (#ff9f0a) */
+    --red:         #ff6d35;
     --gold:        #ff9f0a;
     --text:        #1d1d1f;
     --text-muted:  #86868b;
@@ -896,9 +898,10 @@ button {
 }
 
 .btn-danger {
-    background: linear-gradient(180deg, #ff453a, #ff3b30);
+    background: var(--red);
     color: white;
-    box-shadow: 0 4px 12px rgba(255,59,48,0.4);
+    box-shadow: 0 3px 10px rgba(255, 109, 53, 0.28);
+    border: none;
 }
 
 .btn-danger:hover:not(:disabled) { transform: translateY(-2px); }
@@ -2626,6 +2629,30 @@ button {
     margin-bottom: 24px;
 }
 
+.celebration-card.celebration-slip {
+    padding: 36px 28px 28px;
+}
+
+.celebration-card.celebration-slip .celebration-title {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+    line-height: 1.35;
+    margin-bottom: 10px;
+    color: var(--text);
+}
+
+.celebration-card.celebration-slip .celebration-message {
+    margin-bottom: 16px;
+}
+
+.celebration-card.celebration-slip .slip-celebration-strong {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--green);
+    line-height: 1.35;
+}
+
 .celebration-close {
     width: 100%;
     padding: 14px;
@@ -2742,7 +2769,7 @@ button {
     font-size: 22px;
     font-weight: 700;
     color: var(--text);
-    margin-bottom: 8px;
+    margin-bottom: 20px;
     letter-spacing: -0.4px;
 }
 .urge-subtitle {
@@ -2757,6 +2784,11 @@ button {
     margin-bottom: 16px;
 }
 .breathing-ring { width: 140px; height: 140px; }
+#breathRing {
+    transform: rotate(-90deg);
+    transform-origin: center;
+    transform-box: fill-box;
+}
 .urge-phase {
     font-size: 13px;
     font-weight: 500;
@@ -3047,13 +3079,20 @@ button {
     padding-right: 0;
 }
 
-.onb-journey-intro {
+.onb-journey-formula-box {
+    box-sizing: border-box;
+    width: 100%;
     margin: 0 0 12px;
-    font-size: 13px;
-    line-height: 1.4;
-    text-align: center;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    background: var(--card, #fff);
+    font-size: 14px;
     font-weight: 700;
-    font-style: italic;
+    color: var(--text);
+    line-height: 1.35;
+    text-align: center;
+    letter-spacing: -0.2px;
 }
 
 .onb-journey-slide-title {

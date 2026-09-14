@@ -153,7 +153,6 @@ function showFileProtocolBanner() {
             closeCelebration: closeCelebration,
             modalCancel: closeModal,
             modalConfirm: confirmAction,
-            urgeSurvived: urgeSurvived,
             closeUrge: closeUrge,
             closeCompare: closeCompare,
             'open-learn-journey': openLearnJourney,

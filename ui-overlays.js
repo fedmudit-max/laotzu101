@@ -61,15 +61,64 @@ function triggerJourneyMilestone(days) {
     setTimeout(function () { showCelebration(data); }, 400);
 }
 
+var CELEBRATION_CLOSE_LABEL_DEFAULT = 'Keep Going 💪';
+
 function showCelebration(data, opts = {}) {
     celebrationQueue.push({
         data,
         autoCloseMs: opts.autoCloseMs || null,
         onClose: opts.onClose || null,
+        noConfetti: !!opts.noConfetti,
+        hideEmoji: !!opts.hideEmoji,
+        buttonLabel: opts.buttonLabel || null,
     });
     if (!celebrationShowing) {
         showNextCelebration();
     }
+}
+
+function buildSlipLoggedCelebration(failures) {
+    var max = typeof MAX_FAILURES === 'number' ? MAX_FAILURES : 10;
+    var count = Math.max(0, Number(failures) || 0);
+    if (count >= max) {
+        return {
+            emoji: '🏁',
+            stage: 'JOURNEY COMPLETE',
+            title: 'Chapter Closed',
+            message: 'Every strong day still counts. See how this Journey stacks up.',
+        };
+    }
+    var left = Math.max(0, max - count);
+    return {
+        layout: 'slip',
+        usedLine: count + ' 🛡️ used, ' + left + ' left',
+        stayLine: 'Keep building Strong Days.',
+    };
+}
+
+function paintSlipCelebrationLines(titleEl, msgEl, data) {
+    titleEl.textContent = data.usedLine || '';
+    titleEl.style.display = data.usedLine ? '' : 'none';
+    msgEl.textContent = '';
+    if (!data.stayLine) {
+        msgEl.style.display = 'none';
+        return;
+    }
+    msgEl.style.display = '';
+    if (data.stayLine) {
+        var stay = document.createElement('div');
+        stay.className = 'slip-celebration-strong';
+        stay.textContent = data.stayLine;
+        msgEl.appendChild(stay);
+    }
+}
+
+function showSlipLoggedCelebration(failures) {
+    showCelebration(buildSlipLoggedCelebration(failures), {
+        noConfetti: true,
+        hideEmoji: true,
+        buttonLabel: 'Journey Continues',
+    });
 }
 
 function showNextCelebration() {
@@ -82,13 +131,38 @@ function showNextCelebration() {
     const item = celebrationQueue.shift();
     celebrationOnClose = item.onClose || null;
 
-    const { emoji, stage, title, message } = item.data;
-    document.getElementById('celebEmoji').textContent   = emoji;
-    document.getElementById('celebStage').textContent   = stage;
-    document.getElementById('celebTitle').textContent   = title;
-    document.getElementById('celebMessage').textContent = message;
+    const data = item.data;
+    const { emoji, stage, title, message } = data;
+    const cardEl = document.querySelector('#celebrationOverlay .celebration-card');
+    const emojiEl = document.getElementById('celebEmoji');
+    const stageEl = document.getElementById('celebStage');
+    const titleEl = document.getElementById('celebTitle');
+    const msgEl = document.getElementById('celebMessage');
+
+    if (data.layout === 'slip') {
+        cardEl.classList.add('celebration-slip');
+        emojiEl.style.display = 'none';
+        stageEl.style.display = 'none';
+        paintSlipCelebrationLines(titleEl, msgEl, data);
+    } else {
+        cardEl.classList.remove('celebration-slip');
+        if (item.hideEmoji) {
+            emojiEl.style.display = 'none';
+        } else {
+            emojiEl.style.display = '';
+            emojiEl.textContent = emoji || '';
+        }
+        stageEl.textContent = stage || '';
+        stageEl.style.display = stage ? '' : 'none';
+        titleEl.textContent = title || '';
+        titleEl.style.display = title ? '' : 'none';
+        msgEl.textContent = message || '';
+        msgEl.style.display = message ? '' : 'none';
+    }
+    document.querySelector('#celebrationOverlay .celebration-close').textContent =
+        item.buttonLabel || CELEBRATION_CLOSE_LABEL_DEFAULT;
     document.getElementById('celebrationOverlay').classList.add('active');
-    launchConfetti();
+    if (!item.noConfetti) launchConfetti();
 
     if (celebrationAutoCloseId) {
         clearTimeout(celebrationAutoCloseId);
@@ -236,6 +310,37 @@ function stopBreathSound() {
     activeBreathSound = null;
 }
 
+function getBreathRingCircumference() {
+    return typeof BREATH_RING_CIRCUMFERENCE === 'number' ? BREATH_RING_CIRCUMFERENCE : 339;
+}
+
+function setBreathRingOffset(offset, durationSec) {
+    var ring = document.getElementById('breathRing');
+    if (!ring) return;
+    var max = getBreathRingCircumference();
+    var target = Math.max(0, Math.min(max, offset));
+    if (durationSec && durationSec > 0) {
+        ring.style.transition = 'stroke-dashoffset ' + durationSec + 's ease-in-out';
+    } else {
+        ring.style.transition = 'none';
+    }
+    ring.style.strokeDashoffset = String(target);
+}
+
+/** Snap to start arc, then animate so the first inhale aligns with the ring origin. */
+function animateBreathRing(targetOffset, durationSec) {
+    var ring = document.getElementById('breathRing');
+    if (!ring) return;
+    var max = getBreathRingCircumference();
+    var target = Math.max(0, Math.min(max, targetOffset));
+    var from = target <= 0 ? max : 0;
+    setBreathRingOffset(from, 0);
+    void ring.getBoundingClientRect();
+    requestAnimationFrame(function () {
+        setBreathRingOffset(target, durationSec);
+    });
+}
+
 /** Inhale/exhale breath whoosh via bandpassed brown noise (no audio files). */
 function playBreathSound(kind, durationSec) {
     stopBreathSound();
@@ -247,8 +352,11 @@ function playBreathSound(kind, durationSec) {
     var nodes = [];
     var peak = typeof BREATH_SOUND_GAIN === 'number' ? BREATH_SOUND_GAIN : 0.62;
     var isIn = kind === 'in';
+    var attack = Math.min(0.4, duration * 0.14);
+    var release = Math.min(0.5, duration * 0.16);
+    var sustainEnd = Math.max(attack + 0.05, duration - release);
 
-    var bufferSize = Math.floor(ctx.sampleRate * 3);
+    var bufferSize = Math.ceil(ctx.sampleRate * Math.max(duration + 0.5, 2));
     var buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     fillBreathNoiseBuffer(buffer);
 
@@ -270,22 +378,17 @@ function playBreathSound(kind, durationSec) {
 
     if (isIn) {
         bandpass.frequency.setValueAtTime(280, now);
-        bandpass.frequency.exponentialRampToValueAtTime(2400, now + duration * 0.78);
+        bandpass.frequency.exponentialRampToValueAtTime(2400, now + duration * 0.82);
         bandpass.frequency.exponentialRampToValueAtTime(900, now + duration);
-
-        gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.exponentialRampToValueAtTime(peak, now + duration * 0.22);
-        gain.gain.setValueAtTime(peak * 0.95, now + duration * 0.65);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
     } else {
         bandpass.frequency.setValueAtTime(2000, now);
-        bandpass.frequency.exponentialRampToValueAtTime(320, now + duration * 0.92);
-
-        gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.exponentialRampToValueAtTime(peak * 0.92, now + duration * 0.12);
-        gain.gain.setValueAtTime(peak * 0.85, now + duration * 0.45);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+        bandpass.frequency.exponentialRampToValueAtTime(320, now + duration);
     }
+
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(peak, now + attack);
+    gain.gain.setValueAtTime(peak, now + sustainEnd);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
     source.connect(bandpass);
     bandpass.connect(lowpass);
@@ -293,7 +396,7 @@ function playBreathSound(kind, durationSec) {
     gain.connect(ctx.destination);
 
     source.start(now);
-    source.stop(now + duration + 0.08);
+    source.stop(now + duration + 0.05);
     nodes.push(bandpass, lowpass, gain);
     activeBreathSound = nodes;
 }
@@ -301,25 +404,11 @@ function playBreathSound(kind, durationSec) {
 function startUrgeSurf() {
     getBreathAudioContext();
 
-    // Log this urge with current hour for pattern analysis
     if (!state.urgeLog) state.urgeLog = [];
     state.urgeLog.push({ hour: new Date().getHours(), date: todayKey() });
     saveToStorage(state);
 
-    const count = state.urgesSurfed || 0;
-    if (count > 0) {
-        showCelebration({
-            emoji:   '🌊',
-            stage:   'COPING TOOL',
-            title:   'Ride the urge',
-            message: `You've used this pause ${count} time${count !== 1 ? 's' : ''}. Optional support — no guarantees. Just stay with it without acting.`,
-        }, {
-            autoCloseMs: 2200,
-            onClose: () => launchUrgeTimer(),
-        });
-    } else {
-        launchUrgeTimer();
-    }
+    launchUrgeTimer();
 }
 
 function launchUrgeTimer() {
@@ -331,19 +420,15 @@ function launchUrgeTimer() {
     urgeSecsLeft = URGE_DURATION_SECS;
     updateUrgeCountdown();
     document.getElementById('urgeOverlay').classList.add('active');
+    setBreathRingOffset(getBreathRingCircumference(), 0);
     startBreathing();
 
     urgeInterval = setInterval(() => {
         urgeSecsLeft--;
-        updateUrgeCountdown();
         if (urgeSecsLeft <= 0) {
-            clearInterval(urgeInterval);
-            clearTimeout(breathTimeout);
-            breathTimeout = null;
-            stopBreathSound();
-            document.getElementById('urgePhase').textContent =
-                "Time's up. If the urge is still here, you can stay with it — or close and keep choosing.";
+            urgeSecsLeft = URGE_DURATION_SECS;
         }
+        updateUrgeCountdown();
     }, 1000);
 }
 
@@ -355,10 +440,9 @@ function updateUrgeCountdown() {
 }
 
 function startBreathing() {
-    const ring    = document.getElementById('breathRing');
     const label   = document.getElementById('breathLabel');
     const phase   = document.getElementById('urgePhase');
-    const CIRCUMFERENCE = 339; // 2 * π * 54
+    const max = getBreathRingCircumference();
     const inSecs = typeof BREATH_IN_SECS === 'number' ? BREATH_IN_SECS : 4;
     const outSecs = typeof BREATH_OUT_SECS === 'number' ? BREATH_OUT_SECS : 4;
 
@@ -373,7 +457,7 @@ function startBreathing() {
         {
             label: 'Breathe out',
             phase: 'Exhale slowly for ' + outSecs + ' seconds…',
-            offset: CIRCUMFERENCE,
+            offset: max,
             duration: outSecs,
             sound: 'out',
         },
@@ -385,26 +469,19 @@ function startBreathing() {
     stopBreathSound();
 
     function runPhase() {
-        if (urgeSecsLeft <= 0) return;
+        var overlay = document.getElementById('urgeOverlay');
+        if (!overlay || !overlay.classList.contains('active')) return;
 
         const p = PHASES[phaseIndex];
         label.textContent = p.label;
         phase.textContent = p.phase;
-        ring.style.transition = 'stroke-dashoffset ' + p.duration + 's ease-in-out';
-        ring.style.strokeDashoffset = p.offset;
+        animateBreathRing(p.offset, p.duration);
         playBreathSound(p.sound, p.duration);
         phaseIndex = (phaseIndex + 1) % PHASES.length;
         breathTimeout = setTimeout(runPhase, p.duration * 1000);
     }
 
     runPhase();
-}
-
-function urgeSurvived() {
-    closeUrge();
-    state.urgesSurfed = (state.urgesSurfed || 0) + 1;
-    saveToStorage(state);
-    showToast(state.currentStreak, `🌊 Pause used — ${state.urgesSurfed} time${state.urgesSurfed !== 1 ? 's' : ''}. Ride it without acting.`);
 }
 
 function closeUrge() {
@@ -465,6 +542,10 @@ function scheduleJourneyEndComparisonRetries() {
 /** Paint queued journey-end comparison when DOM is ready. */
 function flushJourneyEndComparisonPending() {
     if (!journeyEndComparisonPending) return false;
+    if (celebrationShowing) {
+        scheduleJourneyEndComparisonRetries();
+        return false;
+    }
     var pending = journeyEndComparisonPending;
     if (!shouldPresentJourneyComparison(pending.comparison)) {
         clearJourneyEndComparisonPending();

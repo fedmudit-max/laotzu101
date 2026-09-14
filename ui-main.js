@@ -705,8 +705,7 @@ function renderJourneyMilestones() {
 
     renderMilestoneSection(
         document.getElementById('strongSection'),
-        expandSectionMilestones([25, 50, 100], { alwaysVisible: true }),
-        { alwaysShow: true },
+        expandSectionMilestones([25, 50, 100], { alwaysVisibleDays: [25, 50] }),
     );
 
     renderMilestoneSection(

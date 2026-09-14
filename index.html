@@ -577,7 +577,7 @@
 
         <div class="onboarding-slide" id="slide-1">
             <div class="onboarding-body onboarding-journey-scroll">
-                <p class="onb-journey-intro">A Journey is Strong Days built against 10 Slips.</p>
+                <div class="onb-journey-formula-box">Journey = n Strong Days / 10 Slips</div>
                 <div class="onb-journey-example-divider">— Example —</div>
 
                 <div class="onb-journey-compare-vertical" aria-label="Example journey improvement">
@@ -637,7 +637,7 @@
         <div style="font-size:14px;color:var(--text-muted);line-height:1.5;margin-bottom:24px;">Log yesterday before you can log today.</div>
         <div style="display:flex;gap:12px;">
             <button data-action="yesterday-strong" style="flex:1;padding:13px;background:linear-gradient(180deg,var(--green-light),var(--green));color:white;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">✓ I Stayed Strong</button>
-            <button data-action="yesterday-slip" style="flex:1;padding:13px;background:linear-gradient(180deg,#ff453a,#ff3b30);color:white;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">✕ I Slipped</button>
+            <button data-action="yesterday-slip" style="flex:1;padding:13px;background:var(--red);color:white;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">✕ I Slipped</button>
         </div>
     </div>
 </div>
@@ -701,7 +701,6 @@
 <div class="overlay" id="urgeOverlay">
     <div class="overlay-card">
         <div class="urge-title">🌊 Surf the Urge</div>
-        <div class="urge-subtitle">Urges typically peak within minutes. Use this time to breathe and wait it out.</div>
 
         <!-- Breathing ring -->
         <div class="breathing-ring-wrap">
@@ -709,8 +708,7 @@
                 <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(52,199,89,0.15)" stroke-width="6"/>
                 <circle cx="60" cy="60" r="54" fill="none" stroke="#34c759" stroke-width="6"
                     stroke-dasharray="339" stroke-dashoffset="339"
-                    stroke-linecap="round" id="breathRing"
-                    style="transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset 4s ease-in-out"/>
+                    stroke-linecap="round" id="breathRing"/>
                 <text x="60" y="56" text-anchor="middle" font-size="13" font-weight="600"
                     fill="#34c759" font-family="-apple-system,sans-serif" id="breathLabel">Breathe in</text>
                 <text x="60" y="73" text-anchor="middle" font-size="22" font-weight="700"
@@ -720,8 +718,7 @@
 
         <div class="urge-phase" id="urgePhase">Inhale slowly for 4 seconds…</div>
 
-        <button class="btn-urge-survived" data-action="urgeSurvived">✓ I'm still holding</button>
-        <button class="btn-urge-cancel"   data-action="closeUrge">Close</button>
+        <button class="btn-urge-cancel" data-action="closeUrge">Close</button>
     </div>
 </div>
 

@@ -206,18 +206,18 @@ function recordFailure() {
                 ? inferJourneyEndWallDate()
                 : todayKey();
             completeEndJourney(endDay);
-            showToast(0, '10 slips logged. Journey complete.');
+            showSlipLoggedCelebration(state.score.failures);
         }
         return;
     }
 
     if (journeyIsOver(state)) {
+        const failures = result.failures;
         completeEndJourney(todayKey());
-        showToast(0, '10 slips logged. Journey complete.');
+        showSlipLoggedCelebration(failures);
     } else {
         chartPage = -1;
         saveAndRender();
-        const failures = result.failures;
-        showToast(0, `${failures} slip${failures === 1 ? '' : 's'} logged. Keep moving forward. Journey continues.`);
+        showSlipLoggedCelebration(result.failures);
     }
 }

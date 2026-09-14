@@ -16,7 +16,7 @@ const WEEKLY_DAY_INSIGHTS = {
 /** Shown on the calendar day a streak breaks — before Day 1 restarts tomorrow. */
 const WEEKLY_SLIP_REFLECT = {
     title: 'Pause & Reflect',
-    body: "Today didn't go as planned. Reflect on what happened today. Tomorrow is Day 1 again—not as a punishment, but as another opportunity to begin with beginner's mind.",
+    body: "Today didn't go as planned. Reflect on what happened today. Tomorrow is Day 1—another opportunity to begin with beginner's mind.",
 };
 
 const TOAST_MESSAGES = [
