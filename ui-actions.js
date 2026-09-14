@@ -206,15 +206,12 @@ function recordFailure() {
                 ? inferJourneyEndWallDate()
                 : todayKey();
             completeEndJourney(endDay);
-            showSlipLoggedCelebration(state.score.failures);
         }
         return;
     }
 
     if (journeyIsOver(state)) {
-        const failures = result.failures;
         completeEndJourney(todayKey());
-        showSlipLoggedCelebration(failures);
     } else {
         chartPage = -1;
         saveAndRender();

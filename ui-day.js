@@ -145,7 +145,6 @@ function logYesterday(result) {
         // End date = yesterday when the 10th slip is attributed to N-1 (not open day N).
         if (slipResult && slipResult.applied && journeyIsOver(state)) {
             completeEndJourney(yKey);
-            showSlipLoggedCelebration(slipResult.failures);
             return;
         }
         if (slipResult && slipResult.applied) {

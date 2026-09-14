@@ -80,14 +80,6 @@ function showCelebration(data, opts = {}) {
 function buildSlipLoggedCelebration(failures) {
     var max = typeof MAX_FAILURES === 'number' ? MAX_FAILURES : 10;
     var count = Math.max(0, Number(failures) || 0);
-    if (count >= max) {
-        return {
-            emoji: '🏁',
-            stage: 'JOURNEY COMPLETE',
-            title: 'Chapter Closed',
-            message: 'Every strong day still counts. See how this Journey stacks up.',
-        };
-    }
     var left = Math.max(0, max - count);
     return {
         layout: 'slip',
