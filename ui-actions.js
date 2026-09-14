@@ -176,37 +176,15 @@ function completeEndJourney(endWallDate) {
     const comparison = archiveCompletedJourney(endWallDate);
     if (!comparison) return;
 
-    var beatPreviousBest = comparison.prevBestScore
-        && isBetterJourneyScore(
-            comparison.score.success,
-            comparison.score.failures,
-            comparison.prevBestScore,
-        );
-
-    // 10th slip logged for a prior day (e.g. yesterday): Journey already ended then —
-    // today is Day 1 of the next Journey, not a forced rest day.
-    var nextAlreadyOpen = false;
-    if (typeof canBeginNextJourneyToday === 'function' && canBeginNextJourneyToday()) {
-        beginNextJourney();
-        nextAlreadyOpen = true;
-    }
+    // Defer beginNextJourney until the user dismisses the comparison popup so
+    // attempt / end-date state and the shown-once key stay tied to this journey.
+    var canOpenNextToday = typeof canBeginNextJourneyToday === 'function'
+        && canBeginNextJourneyToday();
 
     chartPage = -1;
     saveAndRender();
 
-    if (comparison.prevBestScore) {
-        setTimeout(function () {
-            showJourneyComparison(
-                { attempt: comparison.attempt, score: comparison.score },
-                comparison.prevBestScore,
-                {
-                    nextJourneyOpenToday: nextAlreadyOpen,
-                    prevBestAttempt: comparison.prevBestAttempt,
-                    beatBest: beatPreviousBest,
-                },
-            );
-        }, 600);
-    }
+    queueJourneyEndComparison(comparison, { nextJourneyOpenToday: canOpenNextToday });
 }
 
 function recordFailure() {

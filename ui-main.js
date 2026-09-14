@@ -47,8 +47,23 @@ function init() {
         saveToStorage(state);
     }
     // Corrupt / interrupted 10-slip finish → archive so the user is not stuck.
-    if (typeof healStrandedJourneyEnd === 'function' && healStrandedJourneyEnd()) {
-        saveToStorage(state);
+    if (typeof healStrandedJourneyEnd === 'function') {
+        var healedComparison = healStrandedJourneyEnd();
+        if (healedComparison) {
+            saveToStorage(state);
+            if (typeof presentJourneyEndComparison === 'function') {
+                presentJourneyEndComparison(healedComparison, {
+                    nextJourneyOpenToday: typeof canBeginNextJourneyToday === 'function'
+                        && canBeginNextJourneyToday(),
+                });
+            }
+        }
+    }
+    if (typeof isAwaitingNextJourney === 'function' && isAwaitingNextJourney()
+        && typeof tryShowAwaitingJourneyComparison === 'function') {
+        var canOpenNextOnInit = typeof canBeginNextJourneyToday === 'function'
+            && canBeginNextJourneyToday();
+        tryShowAwaitingJourneyComparison(canOpenNextOnInit);
     }
     // Heal stale currentStreak from older saves (log order ≠ calendar order).
     if (typeof recomputeCurrentStreak === 'function') {
@@ -113,6 +128,9 @@ function renderAll(options) {
         }
     }
     if (!options.deferHeavy) deferredHeavyRendered = true;
+    if (typeof flushJourneyEndComparisonPending === 'function') {
+        flushJourneyEndComparisonPending();
+    }
 }
 
 /** Progress tab charts and calendar — safe to run after first paint. */
@@ -594,12 +612,27 @@ function countUnrevealedJourneyMilestones(milestones, alwaysShow) {
     return n;
 }
 
-function buildLockedMilestonePlaceholderHtml() {
+function getNextSectionUnlockAt(milestones, alwaysShow) {
+    for (var i = 0; i < milestones.length; i++) {
+        var m = milestones[i];
+        if (!alwaysShow && !isJourneyMilestoneRevealed(m.unlockAt)) {
+            return m.unlockAt;
+        }
+    }
+    return 0;
+}
+
+function buildLockedMilestonePlaceholderHtml(unlockAt, showHint, hideDayHint) {
+    var msg = 'Keep going to unlock';
+    if (showHint && unlockAt > 0 && !hideDayHint
+        && typeof formatJourneyMilestoneUnlockHint === 'function') {
+        msg = formatJourneyMilestoneUnlockHint(unlockAt);
+    }
     return (
         '<div class="milestone-item milestone-locked">' +
             '<div class="milestone-info">' +
                 '<div class="milestone-icon">🔒</div>' +
-                '<div class="milestone-name">Keep going to unlock</div>' +
+                '<div class="milestone-name">' + msg + '</div>' +
             '</div>' +
         '</div>'
     );
@@ -608,14 +641,12 @@ function buildLockedMilestonePlaceholderHtml() {
 function buildMilestoneSectionHtml(milestones, options) {
     options = options || {};
     var alwaysShow = !!options.alwaysShow;
-    var mysteryLock = !!options.mysteryLock;
     var journeyEnded = isJourneyEndedDisplay();
-
-    if (mysteryLock && !isJourneyMilestoneRevealed(options.mysteryUnlock || 0)) {
-        return '<div class="mystery-lock"><span class="mystery-lock-icon">🔒</span></div>';
-    }
+    var hideUnlockDayHint = !!options.hideUnlockDayHint;
 
     var html = '';
+    var sectionUnlockAt = getNextSectionUnlockAt(milestones, alwaysShow);
+    var showSectionUnlockHint = true;
     var lockedSlotsLeft = lockedMilestoneSlotsForSection(
         countUnrevealedJourneyMilestones(milestones, alwaysShow),
     );
@@ -639,7 +670,12 @@ function buildMilestoneSectionHtml(milestones, options) {
                     '<div class="milestone-status">' + status + '</div>' +
                 '</div>';
         } else if (lockedSlotsLeft > 0) {
-            html += buildLockedMilestonePlaceholderHtml();
+            html += buildLockedMilestonePlaceholderHtml(
+                sectionUnlockAt,
+                showSectionUnlockHint,
+                hideUnlockDayHint,
+            );
+            showSectionUnlockHint = false;
             lockedSlotsLeft--;
         }
     }
@@ -681,7 +717,7 @@ function renderJourneyMilestones() {
     renderMilestoneSection(
         document.getElementById('legendarySection'),
         expandSectionMilestones([500, 750, 1000]),
-        { mysteryLock: true, mysteryUnlock: 400 },
+        { hideUnlockDayHint: true },
     );
 }
 

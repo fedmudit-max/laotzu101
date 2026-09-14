@@ -128,7 +128,7 @@ function applySlipDay({ logDate, calDay }) {
         markTodayStatus(wallDate, 'failed');
     }
     recomputeCurrentStreak();
-    updateBestJourney();
+    // Journey-end best write happens in archiveCompletedJourney (after prev-best snapshot).
     return { applied: true, failures: state.score.failures };
 }
 

@@ -2409,6 +2409,15 @@ button {
 
 .mystery-lock-icon { font-size: 28px; }
 
+.mystery-lock-text {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-muted);
+    line-height: 1.35;
+    text-align: center;
+    padding: 0 8px;
+}
+
 /* ── CHART TOGGLE ── */
 .chart-toggle {
     display: flex;
@@ -2701,6 +2710,9 @@ button {
     visibility: visible;
     pointer-events: all;
 }
+#journeyCompareOverlay {
+    z-index: 3600;
+}
 .overlay-card {
     background: var(--card);
     border-radius: 28px;
@@ -2834,6 +2846,17 @@ button {
 .journey-compare-popup .journey-compare-verdict-muted {
     color: var(--text-muted);
     font-weight: 700;
+}
+
+.journey-compare-popup .journey-compare-first-end {
+    margin: 0;
+}
+
+.journey-compare-popup .journey-compare-first-end .onb-journey-arrow {
+    margin: 10px 0;
+    text-align: center;
+    font-size: 18px;
+    color: var(--text-muted);
 }
 
 .compare-header[hidden] {

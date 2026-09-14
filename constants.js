@@ -6,11 +6,17 @@ const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const MAX_FAILURES = 10;
 const STORAGE_KEY = 'habitTracker_v3';
 const LAST_BACKUP_KEY = 'kingLastBackupAt';
-const URGE_DURATION_SECS = 5 * 60;
+const URGE_DURATION_SECS = 30;
+const BREATH_IN_SECS = 4;
+const BREATH_OUT_SECS = 4;
+/** Peak gain for urge-surf inhale/exhale breath cue (Web Audio). */
+const BREATH_SOUND_GAIN = 0.75;
 const BACKUP_FORMAT = 'king-backup';
 const BACKUP_VERSION = 1;
 /** Local free trial length. Access window is trialStartedAt + this many days. */
 const PREMIUM_TRIAL_DAYS = 30;
+/** Last N trial days: full Premium feature list + stronger subscribe CTA in the panel. */
+const PREMIUM_TRIAL_COUNTDOWN_DAYS = 7;
 /**
  * Play Console subscriptions for com.kingtracker.app.
  *
@@ -72,6 +78,6 @@ const PREMIUM_FEATURES = [
     'Features in future',
 ];
 
-/** Shown under the feature list on the premium panel. */
+/** Shown under the feature list on the premium panel (countdown + expired). */
 const PREMIUM_BACKUP_NOTE =
     'Daily logging stays free forever. Above features need Premium after the trial. Buying Premium never resets your Journey score.';

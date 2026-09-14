@@ -220,8 +220,14 @@ function getWeeklyClockMs() {
     return Date.now();
 }
 
+/** Local midnight for intra-day traveler clock. */
+function getWallDayStartMs() {
+    return parseDateKey(todayKey()).getTime();
+}
+
 function getIntraDaySegmentProgress() {
-    const hours = (getWeeklyClockMs() - parseDateKey(todayKey()).getTime()) / 3600000;
+    const hours = (getWeeklyClockMs() - getWallDayStartMs()) / 3600000;
+    if (hours < 0) return 0;
     if (hours < 8) return 0;
     if (hours < 16) return 1 / 3;
     return 2 / 3;

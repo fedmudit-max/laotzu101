@@ -175,10 +175,6 @@ function countLifetimeRelapses() {
     return n;
 }
 
-function nextSlipCount(logDate, calDay) {
-    return 1;
-}
-
 function countLifetimeJourneys() {
     var completed = (state.completedJourneys || []).length;
     var attempt = Math.max(1, Math.floor(Number(state.attempt) || 1));
