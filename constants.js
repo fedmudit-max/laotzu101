@@ -73,7 +73,6 @@ const PREMIUM_FEATURES = [
     'Daily knowledge cards',
     'Monthly Mirror',
     'Progress Graph',
-    'Export & import progress',
     'Daily reminder to log your day',
     'Features in future',
 ];

@@ -35,7 +35,6 @@ function applyPremiumTierLayout() {
         'knowledgeCard',
         'monthPanelCard',
         'chartPanelCard',
-        'premiumBackupGate',
         'remindPanelCard',
     ];
     for (var i = 0; i < gatedIds.length; i++) {
@@ -191,7 +190,7 @@ function renderPremiumPanelContent() {
         return;
     }
 
-    statusEl.textContent = 'Free trial ended. Daily logging stays free forever. Subscribe to unlock timeline, milestones, Monthly Mirror, Progress Graph, and export/import. Your score is not affected.';
+        statusEl.textContent = 'Free trial ended. Daily logging stays free forever. Subscribe to unlock timeline, milestones, Monthly Mirror, and Progress Graph. Your score is not affected.';
     fillPremiumFeatureList(listEl);
     setPremiumFeatureListVisible(listEl, true);
     setPremiumBackupNote(noteEl, true);
