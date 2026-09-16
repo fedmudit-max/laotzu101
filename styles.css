@@ -913,6 +913,23 @@ button {
     background: linear-gradient(180deg, #9ca3af, #6b7280);
     box-shadow: none;
 }
+
+.action-buttons .action-btn-full {
+    grid-column: 1 / -1;
+}
+
+.btn-danger.logged-slip {
+    opacity: 1;
+    cursor: default;
+    background: var(--bg);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    box-shadow: none;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.35;
+    padding: 12px 14px;
+}
 .actions-card .collapse-body {
     padding: 0;
 }

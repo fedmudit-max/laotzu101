@@ -201,7 +201,7 @@ function renderTopStats() {
     const breakdownEl = document.getElementById('currentJourneyBreakdown');
     if (breakdownEl) {
         breakdownEl.textContent =
-            `${success} strong ${success === 1 ? 'day' : 'days'} · ` +
+            `${success} strong ${success === 1 ? 'day' : 'days'} / ` +
             `${failures} ${failures === 1 ? 'slip' : 'slips'}`;
         breakdownEl.setAttribute(
             'title',
@@ -263,15 +263,23 @@ function renderChances() {
     }
 }
 
+function resetActionButtonLayout(successBtn, failBtn) {
+    if (!successBtn || !failBtn) return;
+    successBtn.hidden = false;
+    failBtn.classList.remove('logged-slip', 'action-btn-full');
+}
+
 function renderButtons() {
     const successBtn = document.getElementById('successBtn');
     const failBtn    = document.getElementById('failBtn');
+    if (!successBtn || !failBtn) return;
+
+    resetActionButtonLayout(successBtn, failBtn);
 
     if (isAwaitingNextJourney()) {
-        successBtn.disabled = true;
-        successBtn.classList.remove('logged');
-        successBtn.textContent = '✓ I STAYED STRONG TODAY';
+        successBtn.hidden = true;
         failBtn.disabled = true;
+        failBtn.classList.add('logged-slip', 'action-btn-full');
         failBtn.textContent = 'New journey starts tomorrow';
         return;
     }
@@ -293,11 +301,10 @@ function renderButtons() {
         failBtn.textContent = '✕ Blocked';
 
     } else if (state.todayStatus === 'failed') {
-        successBtn.disabled = true;
-        successBtn.classList.remove('logged');
-        successBtn.textContent = 'Plan to avoid it next time';
+        successBtn.hidden = true;
         failBtn.disabled = true;
-        failBtn.textContent = 'Slip logged';
+        failBtn.classList.add('logged-slip', 'action-btn-full');
+        failBtn.textContent = 'One slip used. Your Journey continues.';
 
     } else {
         successBtn.disabled = false;
