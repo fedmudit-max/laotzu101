@@ -2827,18 +2827,8 @@ button {
     margin-bottom: 10px;
     box-shadow: 0 4px 14px rgba(52,199,89,0.4);
 }
-.btn-urge-cancel {
+#urgeOverlay .btn-success {
     width: 100%;
-    padding: 12px;
-    background: transparent;
-    color: var(--text-muted);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    font-family: inherit;
-    box-shadow: none;
 }
 
 /* ── JOURNEY COMPARISON ── */

@@ -259,7 +259,7 @@ function renderChances() {
     if (labelEl) {
         labelEl.className = `chances-label ${tier}`;
         labelEl.textContent =
-            `🛡️ ${remaining} ${remaining === 1 ? 'slip' : 'slips'} left`;
+            `${remaining} ${remaining === 1 ? 'slip' : 'slips'} left`;
     }
 }
 
@@ -304,7 +304,7 @@ function renderButtons() {
         successBtn.hidden = true;
         failBtn.disabled = true;
         failBtn.classList.add('logged-slip', 'action-btn-full');
-        failBtn.textContent = 'One slip used. Your Journey continues.';
+        failBtn.textContent = 'Slip logged. Journey continues. Stay strong tomorrow.';
 
     } else {
         successBtn.disabled = false;
