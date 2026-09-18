@@ -918,13 +918,13 @@ button {
     grid-column: 1 / -1;
 }
 
-.action-buttons .logged-slip {
+.action-buttons .day-logged {
     opacity: 1;
     cursor: default;
     pointer-events: none;
-    background: var(--bg);
-    color: var(--text-muted);
-    border: 1px solid var(--border);
+    background: linear-gradient(180deg, #b8bcc4, #9ca3af);
+    color: white;
+    border: none;
     box-shadow: none;
     font-size: 13px;
     font-weight: 600;

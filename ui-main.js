@@ -269,11 +269,11 @@ function resetActionButtonLayout(successBtn, failBtn) {
     failBtn.hidden = false;
     successBtn.disabled = false;
     failBtn.disabled = false;
-    successBtn.classList.remove('logged-slip');
-    failBtn.classList.remove('logged-slip', 'action-btn-full');
+    successBtn.classList.remove('day-logged');
+    failBtn.classList.remove('day-logged', 'action-btn-full');
 }
 
-const POST_SLIP_LOGGED = 'Slip logged. Journey continues.';
+const POST_SLIP_LOGGED = 'Slip logged.';
 const POST_SLIP_TOMORROW = 'Stay strong tomorrow.';
 
 function renderButtons() {
@@ -286,7 +286,7 @@ function renderButtons() {
     if (isAwaitingNextJourney()) {
         successBtn.hidden = true;
         failBtn.disabled = true;
-        failBtn.classList.add('logged-slip', 'action-btn-full');
+        failBtn.classList.add('day-logged', 'action-btn-full');
         failBtn.textContent = 'New journey starts tomorrow';
         return;
     }
@@ -305,15 +305,16 @@ function renderButtons() {
         successBtn.classList.add('logged');
         successBtn.textContent = 'Strong 💪';
         failBtn.disabled = true;
+        failBtn.classList.add('day-logged');
         failBtn.textContent = 'Day Logged';
 
     } else if (state.todayStatus === 'failed') {
         successBtn.disabled = true;
         successBtn.classList.remove('logged');
-        successBtn.classList.add('logged-slip');
+        successBtn.classList.add('day-logged');
         successBtn.textContent = POST_SLIP_TOMORROW;
         failBtn.disabled = true;
-        failBtn.classList.add('logged-slip');
+        failBtn.classList.add('day-logged');
         failBtn.textContent = POST_SLIP_LOGGED;
 
     } else {
