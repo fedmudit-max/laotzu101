@@ -85,6 +85,78 @@ test('next journey target after first journey with 12 strong days', () => {
     assert.equal(ctx.getNextJourneyTargetGoal(), 'Beat 12 Strong Days to Win');
 });
 
+test('next journey target after first journey with 26 strong days', () => {
+    const ctx = createKingContext();
+    resetKing(ctx, { today: '2026-06-15' });
+    seedJourney(ctx, { today: '2026-06-15', start: '2026-06-15' });
+    setState(ctx, {
+        pendingNextJourney: true,
+        journeyEndedDate: '2026-06-15',
+        completedJourneys: [{
+            attempt: 1,
+            score: { success: 26, failures: 10 },
+            date: '2026-06-15T00:00:00.000Z',
+        }],
+        bestJourney: { success: 26, failures: 10 },
+    });
+
+    assert.equal(ctx.formatNextJourneyTargetLine(2), 'Journey 2: Beat 26 Strong Days to Win');
+    assert.equal(ctx.getNextJourneyTargetGoal(), 'Beat 26 Strong Days to Win');
+});
+
+test('next journey target keeps all-time best when latest journey scores lower', () => {
+    const ctx = createKingContext();
+    resetKing(ctx, { today: '2026-06-20' });
+    seedJourney(ctx, { today: '2026-06-20', start: '2026-06-20', attempt: 2 });
+    setState(ctx, {
+        pendingNextJourney: true,
+        journeyEndedDate: '2026-06-20',
+        score: { success: 20, failures: 10 },
+        completedJourneys: [
+            {
+                attempt: 1,
+                score: { success: 26, failures: 10 },
+                date: '2026-06-10T00:00:00.000Z',
+            },
+            {
+                attempt: 2,
+                score: { success: 20, failures: 10 },
+                date: '2026-06-20T00:00:00.000Z',
+            },
+        ],
+        bestJourney: { success: 26, failures: 10 },
+    });
+
+    assert.equal(ctx.getNextJourneyTargetGoal(), 'Beat 26 Strong Days to Win');
+    assert.equal(ctx.formatNextJourneyTargetLine(3), 'Journey 3: Beat 26 Strong Days to Win');
+});
+
+test('next journey target uses new best when latest journey beats prior best', () => {
+    const ctx = createKingContext();
+    resetKing(ctx, { today: '2026-06-20' });
+    seedJourney(ctx, { today: '2026-06-20', start: '2026-06-20', attempt: 2 });
+    setState(ctx, {
+        pendingNextJourney: true,
+        journeyEndedDate: '2026-06-20',
+        score: { success: 30, failures: 10 },
+        completedJourneys: [
+            {
+                attempt: 1,
+                score: { success: 26, failures: 10 },
+                date: '2026-06-10T00:00:00.000Z',
+            },
+            {
+                attempt: 2,
+                score: { success: 30, failures: 10 },
+                date: '2026-06-20T00:00:00.000Z',
+            },
+        ],
+        bestJourney: { success: 30, failures: 10 },
+    });
+
+    assert.equal(ctx.getNextJourneyTargetGoal(), 'Beat 30 Strong Days to Win');
+});
+
 test('next journey target after first journey with no strong days', () => {
     const ctx = createKingContext();
     resetKing(ctx, { today: '2026-06-15' });

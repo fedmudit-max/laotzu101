@@ -600,17 +600,13 @@ function getBestJourneyHintText(s) {
     return parts.targetLine;
 }
 
-/** Target for the next journey (Day 0) — works while awaiting next journey after archive. */
+/** Target for the next journey — all-time best (new best sticks; lower finish keeps prior best). */
 function getNextJourneyTargetGoal(s) {
     s = s || state;
-    var targetDay = getActiveJourneyTargetDay(0, s);
-    if (!targetDay) return 'Target 25 strong days';
-
-    var priorBest = getCompletedJourneysBestSuccess(s);
-    if (priorBest > 0 && targetDay === priorBest) {
-        return formatStrongDaysToWinLabel(targetDay, false);
-    }
-    return 'Target ' + targetDay + ' strong days';
+    var best = getDisplayBestJourney(s);
+    var n = Math.max(0, Number(best.success) || 0);
+    if (n > 0) return formatStrongDaysToWinLabel(n, false);
+    return 'Target 25 strong days';
 }
 
 function formatNextJourneyTargetLine(nextAttempt, s) {
