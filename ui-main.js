@@ -305,7 +305,7 @@ function renderButtons() {
         successBtn.classList.add('logged');
         successBtn.textContent = 'Strong 💪';
         failBtn.disabled = true;
-        failBtn.textContent = '✕ Blocked';
+        failBtn.textContent = 'Day Logged';
 
     } else if (state.todayStatus === 'failed') {
         successBtn.disabled = true;
