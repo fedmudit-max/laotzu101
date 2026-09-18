@@ -1,4 +1,4 @@
-const CACHE_NAME = 'king-v286';
+const CACHE_NAME = 'king-v290';
 
 function logSwOptionalFailure(area, err) {
     try {

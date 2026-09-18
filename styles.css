@@ -3117,6 +3117,63 @@ button {
     color: var(--text-muted);
 }
 
+.onb-journey-example-table {
+    width: 100%;
+    margin: 0 0 12px;
+    border-collapse: collapse;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--card, #fff);
+}
+
+.onb-journey-example-table th,
+.onb-journey-example-table td {
+    padding: 10px 8px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.onb-journey-example-table th {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+}
+
+.onb-journey-example-table tbody tr:nth-child(even) {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.onb-journey-example-table td:first-child {
+    font-weight: 700;
+    color: var(--text);
+}
+
+.onb-journey-example-table td:nth-child(2) {
+    font-weight: 700;
+    color: var(--green);
+}
+
+.onb-journey-example-table td:last-child {
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.onb-journey-goal {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.45;
+    text-align: center;
+    color: var(--text);
+}
+
 .onb-journey-compare-vertical {
     margin: 0 0 10px;
     text-align: center;
