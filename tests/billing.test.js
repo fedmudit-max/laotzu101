@@ -135,18 +135,18 @@ test('expired cache after restore denies premium when trial ended', () => {
     assert.equal(ctx.Entitlement.hasPremiumAccess(getState(ctx)), false);
 });
 
-test('premium trial panel phase is early when more than countdown days remain', () => {
+test('premium trial panel phase is early during trial', () => {
     const ctx = createKingContext();
     resetKing(ctx);
     setState(ctx, { trialStartedAt: isoDaysFromNow(-10) });
     assert.equal(ctx.getPremiumTrialPanelPhase(), 'early');
 });
 
-test('premium trial panel phase is countdown in the last week', () => {
+test('premium trial panel phase stays early in the last trial week', () => {
     const ctx = createKingContext();
     resetKing(ctx);
     setState(ctx, { trialStartedAt: isoDaysFromNow(-(30 - 5)) });
-    assert.equal(ctx.getPremiumTrialPanelPhase(), 'countdown');
+    assert.equal(ctx.getPremiumTrialPanelPhase(), 'early');
 });
 
 test('premium trial panel phase is expired after trial ends', () => {

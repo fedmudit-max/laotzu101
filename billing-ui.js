@@ -105,29 +105,18 @@ function syncPremiumPanel() {
     if (premiumPanelOpen) renderPremiumPanelContent();
 }
 
-function fillPremiumFeatureList(listEl) {
-    if (!listEl) return;
-    listEl.innerHTML = PREMIUM_FEATURES.map(function (f) {
-        return '<li>' + f + '</li>';
-    }).join('');
-}
-
 function formatTrialDaysLeft(left) {
     return left === 1 ? '1 free day left' : left + ' free days left';
 }
 
 /**
- * Premium panel phase during trial: early (status only) → countdown (full list) → expired.
- * @returns {'active'|'early'|'countdown'|'expired'}
+ * Premium panel phase: trial (status only), paid active, or expired.
+ * @returns {'active'|'early'|'expired'}
  */
 function getPremiumTrialPanelPhase() {
     if (Entitlement.isSubscriptionActive()) return 'active';
     if (!Entitlement.isTrialActive()) return 'expired';
-    var left = Entitlement.daysRemaining();
-    var countdownDays = typeof PREMIUM_TRIAL_COUNTDOWN_DAYS === 'number'
-        ? PREMIUM_TRIAL_COUNTDOWN_DAYS
-        : 7;
-    return left <= countdownDays ? 'countdown' : 'early';
+    return 'early';
 }
 
 function setPremiumPanelSubscribeLabel(text) {
@@ -135,35 +124,14 @@ function setPremiumPanelSubscribeLabel(text) {
     if (btn) btn.textContent = text;
 }
 
-function setPremiumFeatureListVisible(listEl, visible) {
-    if (!listEl) return;
-    listEl.hidden = !visible;
-    if (!visible) listEl.innerHTML = '';
-}
-
-function setPremiumBackupNote(el, visible) {
-    if (!el) return;
-    if (!visible) {
-        el.hidden = true;
-        el.textContent = '';
-        return;
-    }
-    el.hidden = false;
-    el.textContent = PREMIUM_BACKUP_NOTE;
-}
-
 function renderPremiumPanelContent() {
     var statusEl = document.getElementById('premiumPanelStatus');
-    var listEl = document.getElementById('premiumPanelFeatures');
-    var noteEl = document.getElementById('premiumPanelBackupNote');
-    if (!statusEl || !listEl) return;
+    if (!statusEl) return;
 
     var phase = getPremiumTrialPanelPhase();
 
     if (phase === 'active') {
         statusEl.textContent = 'Premium is active. Billing and renewal are managed in Google Play.';
-        setPremiumFeatureListVisible(listEl, false);
-        setPremiumBackupNote(noteEl, false);
         setPremiumPanelSubscribeLabel('Manage in Google Play');
         return;
     }
@@ -171,30 +139,11 @@ function renderPremiumPanelContent() {
     if (phase === 'early') {
         var earlyLeft = Entitlement.daysRemaining();
         statusEl.textContent = formatTrialDaysLeft(earlyLeft) + '.';
-        setPremiumFeatureListVisible(listEl, false);
-        setPremiumBackupNote(noteEl, false);
-        setPremiumPanelSubscribeLabel('Subscribe anytime');
+        setPremiumPanelSubscribeLabel('Subscribe');
         return;
     }
 
-    if (phase === 'countdown') {
-        var countdownLeft = Entitlement.daysRemaining();
-        statusEl.textContent = countdownLeft === 1
-            ? 'Trial ends tomorrow. Subscribe to keep everything below.'
-            : 'Trial ends in ' + countdownLeft + ' days. Subscribe to keep everything below.';
-        fillPremiumFeatureList(listEl);
-        setPremiumFeatureListVisible(listEl, true);
-        setPremiumBackupNote(noteEl, true);
-        if (noteEl) noteEl.textContent = PREMIUM_BACKUP_NOTE;
-        setPremiumPanelSubscribeLabel('Keep Premium after trial');
-        return;
-    }
-
-        statusEl.textContent = 'Free trial ended. Daily logging stays free forever. Subscribe to unlock timeline, milestones, Monthly Mirror, and Progress Graph. Your score is not affected.';
-    fillPremiumFeatureList(listEl);
-    setPremiumFeatureListVisible(listEl, true);
-    setPremiumBackupNote(noteEl, true);
-    if (noteEl) noteEl.textContent = PREMIUM_BACKUP_NOTE;
+    statusEl.textContent = 'Trial ended.';
     setPremiumPanelSubscribeLabel('View plans & subscribe');
 }
 
@@ -208,24 +157,21 @@ function renderPremiumStatus() {
         if (teaserEl) teaserEl.textContent = 'Active · Google Play';
         if (cardEl) {
             cardEl.classList.add('premium-active-state');
-            cardEl.classList.remove('premium-trial-state', 'premium-expired-state', 'premium-trial-early', 'premium-trial-countdown');
+            cardEl.classList.remove('premium-trial-state', 'premium-expired-state');
         }
     } else if (Entitlement.isTrialActive()) {
-        var trialPhase = getPremiumTrialPanelPhase();
         if (titleEl) titleEl.textContent = '⭐ Premium trial';
         if (teaserEl) teaserEl.textContent = '';
         if (cardEl) {
             cardEl.classList.add('premium-trial-state');
             cardEl.classList.remove('premium-active-state', 'premium-expired-state');
-            cardEl.classList.toggle('premium-trial-early', trialPhase === 'early');
-            cardEl.classList.toggle('premium-trial-countdown', trialPhase === 'countdown');
         }
     } else {
         if (titleEl) titleEl.textContent = '⭐ Premium';
         if (teaserEl) teaserEl.textContent = 'Logging free · unlock all features';
         if (cardEl) {
             cardEl.classList.add('premium-expired-state');
-            cardEl.classList.remove('premium-active-state', 'premium-trial-state', 'premium-trial-early', 'premium-trial-countdown');
+            cardEl.classList.remove('premium-active-state', 'premium-trial-state');
         }
     }
 
