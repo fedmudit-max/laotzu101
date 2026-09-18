@@ -266,8 +266,15 @@ function renderChances() {
 function resetActionButtonLayout(successBtn, failBtn) {
     if (!successBtn || !failBtn) return;
     successBtn.hidden = false;
+    failBtn.hidden = false;
+    successBtn.disabled = false;
+    failBtn.disabled = false;
+    successBtn.classList.remove('logged-slip');
     failBtn.classList.remove('logged-slip', 'action-btn-full');
 }
+
+const POST_SLIP_LOGGED = 'Slip logged. Journey continues.';
+const POST_SLIP_TOMORROW = 'Stay strong tomorrow.';
 
 function renderButtons() {
     const successBtn = document.getElementById('successBtn');
@@ -301,10 +308,13 @@ function renderButtons() {
         failBtn.textContent = '✕ Blocked';
 
     } else if (state.todayStatus === 'failed') {
-        successBtn.hidden = true;
+        successBtn.disabled = true;
+        successBtn.classList.remove('logged');
+        successBtn.classList.add('logged-slip');
+        successBtn.textContent = POST_SLIP_TOMORROW;
         failBtn.disabled = true;
-        failBtn.classList.add('logged-slip', 'action-btn-full');
-        failBtn.textContent = 'Slip logged. Journey continues. Stay strong tomorrow.';
+        failBtn.classList.add('logged-slip');
+        failBtn.textContent = POST_SLIP_LOGGED;
 
     } else {
         successBtn.disabled = false;
