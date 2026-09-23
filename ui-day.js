@@ -339,7 +339,11 @@ function checkOnboarding() {
     const overlay = document.getElementById('onboardingOverlay');
     if (!overlay) return;
 
-    if (!safeGet('onboardingComplete')) {
+    var topBar = document.getElementById('appTopBar');
+    var onboardingDone = !!safeGet('onboardingComplete');
+    if (topBar) topBar.hidden = !onboardingDone;
+
+    if (!onboardingDone) {
         resetOnboardingUI();
         overlay.style.display = 'flex';
         overlay.style.pointerEvents = 'auto';
@@ -380,6 +384,9 @@ function completeOnboarding() {
             overlay.style.pointerEvents = 'none';
         }, 400);
     }
+
+    var topBar = document.getElementById('appTopBar');
+    if (topBar) topBar.hidden = false;
 
     if (typeof monthPanelOpen !== 'undefined') monthPanelOpen = true;
     if (typeof deferredHeavyRendered !== 'undefined') deferredHeavyRendered = false;

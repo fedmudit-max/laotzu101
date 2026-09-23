@@ -11,7 +11,7 @@ import androidx.core.app.NotificationManagerCompat;
 import com.kingtracker.app.R;
 
 public final class ReminderNotifier {
-    static final String CHANNEL_ID = "king_daily_reminder_v6";
+    static final String CHANNEL_ID = "king_daily_reminder_v7";
     static final String LEGACY_CHANNEL_ID = "king_daily_reminder";
     static final String LEGACY_CHANNEL_ID_V2 = "king_daily_reminder_v2";
     static final String LEGACY_CHANNEL_ID_V3 = "king_daily_reminder_v3";
@@ -24,8 +24,6 @@ public final class ReminderNotifier {
         Context app = context.getApplicationContext();
 
         PendingIntent content = activityIntent(app, ReminderIntents.openApp(app), ReminderScheduler.REQUEST_SHOW);
-        PendingIntent strong = activityIntent(app, ReminderIntents.logAction(app, "strong"), ReminderScheduler.REQUEST_LOG_STRONG);
-        PendingIntent slip = activityIntent(app, ReminderIntents.logAction(app, "slip"), ReminderScheduler.REQUEST_LOG_SLIP);
 
         String title = test
             ? context.getString(R.string.reminder_test_title)
@@ -39,14 +37,12 @@ public final class ReminderNotifier {
             .setStyle(new NotificationCompat.BigTextStyle().bigText(body))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_REMINDER)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
             .setAutoCancel(true)
             .setOnlyAlertOnce(!test)
             .setDefaults(NotificationCompat.DEFAULT_ALL)
             .setColor(0xFF34C759)
-            .setContentIntent(content)
-            .addAction(0, context.getString(R.string.reminder_action_strong), strong)
-            .addAction(0, context.getString(R.string.reminder_action_slip), slip);
+            .setContentIntent(content);
 
         NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, builder.build());
         android.util.Log.i("KingReminder", test ? "show test notification" : "show daily notification");
@@ -65,13 +61,14 @@ public final class ReminderNotifier {
         manager.deleteNotificationChannel(LEGACY_CHANNEL_ID_V3);
         manager.deleteNotificationChannel("king_daily_reminder_v4");
         manager.deleteNotificationChannel("king_daily_reminder_v5");
+        manager.deleteNotificationChannel("king_daily_reminder_v6");
         NotificationChannel channel = new NotificationChannel(
             CHANNEL_ID,
             context.getString(R.string.reminder_channel_name),
             NotificationManager.IMPORTANCE_HIGH
         );
         channel.setDescription(context.getString(R.string.reminder_channel_desc));
-        channel.setLockscreenVisibility(android.app.Notification.VISIBILITY_PUBLIC);
+        channel.setLockscreenVisibility(android.app.Notification.VISIBILITY_PRIVATE);
         channel.enableVibration(true);
         channel.setShowBadge(true);
         manager.createNotificationChannel(channel);

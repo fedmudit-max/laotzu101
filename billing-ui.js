@@ -35,15 +35,16 @@ function applyPremiumTierLayout() {
         'knowledgeCard',
         'monthPanelCard',
         'chartPanelCard',
-        'remindPanelCard',
+        'settingsReminderSection',
     ];
     for (var i = 0; i < gatedIds.length; i++) {
         setPremiumGated(gatedIds[i], !unlocked);
     }
     setPremiumSectionVisible('primaryStack', true);
+    setPremiumSectionVisible('appTopBar', true);
     setPremiumSectionVisible('learnJourneyCard', true);
     setPremiumSectionVisible('premiumPanelCard', true);
-    setPremiumSectionVisible('backupResetCard', true);
+    setPremiumSectionVisible('settingsDataSection', true);
     setPremiumSectionVisible('exportBackupBtn', true);
     setPremiumSectionVisible('importBackupBtn', true);
     setPremiumSectionVisible('lastBackupLabel', true);

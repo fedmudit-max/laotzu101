@@ -136,7 +136,10 @@ function showFileProtocolBanner() {
         var actions = {
             success: handleSuccess,
             'modal-fail': function () { showModal('fail'); },
-            'modal-reset': function () { showModal('reset'); },
+            'modal-reset': function () {
+                closeAppSettings();
+                showModal('reset');
+            },
             urge: startUrgeSurf,
             'tab-0': function () { switchTab(0); },
             'tab-1': function () { switchTab(1); },
@@ -162,6 +165,12 @@ function showFileProtocolBanner() {
             'export-save-downloads': function () { runAndroidNativeExport('downloads'); },
             'export-choose-folder': function () { runAndroidNativeExport('folder'); },
             'export-choice-cancel': closeExportChoiceModal,
+            'open-privacy': function () {
+                closeAppSettings();
+                window.location.href = './privacy.html';
+            },
+            'open-settings': openAppSettings,
+            'close-settings': closeAppSettings,
         };
         if (actions[action]) actions[action]();
     }
@@ -192,6 +201,13 @@ function showFileProtocolBanner() {
     if (exportChoiceModal) {
         exportChoiceModal.addEventListener('click', function (e) {
             if (e.target.id === 'exportChoiceModal') closeExportChoiceModal();
+        });
+    }
+
+    var settingsOverlay = document.getElementById('appSettingsOverlay');
+    if (settingsOverlay) {
+        settingsOverlay.addEventListener('click', function (e) {
+            if (e.target.id === 'appSettingsOverlay') closeAppSettings();
         });
     }
 
