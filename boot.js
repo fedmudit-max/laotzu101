@@ -165,10 +165,8 @@ function showFileProtocolBanner() {
             'export-save-downloads': function () { runAndroidNativeExport('downloads'); },
             'export-choose-folder': function () { runAndroidNativeExport('folder'); },
             'export-choice-cancel': closeExportChoiceModal,
-            'open-privacy': function () {
-                closeAppSettings();
-                window.location.href = './privacy.html';
-            },
+            'open-privacy': openPrivacy,
+            'close-privacy': closePrivacy,
             'open-settings': openAppSettings,
             'close-settings': closeAppSettings,
         };
@@ -208,6 +206,13 @@ function showFileProtocolBanner() {
     if (settingsOverlay) {
         settingsOverlay.addEventListener('click', function (e) {
             if (e.target.id === 'appSettingsOverlay') closeAppSettings();
+        });
+    }
+
+    var privacyOverlay = document.getElementById('privacyOverlay');
+    if (privacyOverlay) {
+        privacyOverlay.addEventListener('click', function (e) {
+            if (e.target.id === 'privacyOverlay') closePrivacy();
         });
     }
 
@@ -254,6 +259,7 @@ function showFileProtocolBanner() {
     }
 
     function startApp() {
+        if (typeof fillPrivacyOverlayBody === 'function') fillPrivacyOverlayBody();
         try { initFirebase(); } catch (err) { console.error('King firebase init failed:', err); }
         try { init(); } catch (err) { console.error('King init failed:', err); }
         try { initReminders(); } catch (err) { console.error('King reminder init failed:', err); }

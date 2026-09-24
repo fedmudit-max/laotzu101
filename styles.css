@@ -627,6 +627,65 @@ body::before {
     transform: translateY(0);
 }
 
+.privacy-overlay {
+    z-index: 2300;
+}
+
+.privacy-overlay .learn-journey-card-panel.privacy-panel {
+    height: min(88vh, 720px);
+    min-height: 320px;
+}
+
+.privacy-scroll .meta {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin: 0 0 20px;
+    line-height: 1.45;
+}
+
+.privacy-scroll h2 {
+    font-size: 15px;
+    font-weight: 800;
+    margin: 22px 0 8px;
+    color: var(--text);
+}
+
+.privacy-scroll p,
+.privacy-scroll li {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--text-muted);
+    margin: 0 0 10px;
+}
+
+.privacy-scroll ul {
+    padding-left: 1.2rem;
+    margin: 0 0 10px;
+}
+
+.privacy-scroll a {
+    color: #007aff;
+}
+
+.privacy-scroll .summary {
+    background: rgba(60, 60, 67, 0.06);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 4px;
+}
+
+.privacy-scroll .summary strong {
+    color: var(--green);
+    font-weight: 700;
+}
+
+.privacy-loading,
+.privacy-error {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin: 0;
+}
+
 .learn-journey-header {
     display: flex;
     align-items: flex-start;

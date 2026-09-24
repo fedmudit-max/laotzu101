@@ -861,3 +861,33 @@ function closeAppSettings() {
     overlay.classList.remove('active');
     overlay.setAttribute('aria-hidden', 'true');
 }
+
+function fillPrivacyOverlayBody() {
+    var body = document.getElementById('privacyOverlayBody');
+    if (!body || body.dataset.loaded === '1') return;
+    var embedded = window.KING_PRIVACY_POLICY_BODY;
+    if (typeof embedded !== 'string' || !embedded.length) return;
+    body.innerHTML = embedded;
+    body.dataset.loaded = '1';
+}
+
+function openPrivacy() {
+    var overlay = document.getElementById('privacyOverlay');
+    var body = document.getElementById('privacyOverlayBody');
+    if (!overlay || !body) return;
+    fillPrivacyOverlayBody();
+    if (body.dataset.loaded !== '1') {
+        body.innerHTML =
+            '<p class="privacy-error">Privacy text is missing. Run: npm run web:copy</p>';
+    }
+    overlay.classList.add('active');
+    overlay.setAttribute('aria-hidden', 'false');
+    body.scrollTop = 0;
+}
+
+function closePrivacy() {
+    var overlay = document.getElementById('privacyOverlay');
+    if (!overlay) return;
+    overlay.classList.remove('active');
+    overlay.setAttribute('aria-hidden', 'true');
+}
