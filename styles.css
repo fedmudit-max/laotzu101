@@ -650,6 +650,26 @@ body::before {
     color: var(--text);
 }
 
+.privacy-scroll .summary h2 {
+    margin: 0 0 10px;
+    font-size: 14px;
+}
+
+.privacy-scroll h3 {
+    font-size: 14px;
+    font-weight: 700;
+    margin: 16px 0 6px;
+    color: var(--text);
+}
+
+.privacy-scroll .effective-footer {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(60, 60, 67, 0.12);
+}
+
 .privacy-scroll p,
 .privacy-scroll li {
     font-size: 14px;
