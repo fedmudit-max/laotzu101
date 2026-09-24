@@ -8,9 +8,9 @@
 |--------|--------|
 | GitHub | `fedmudit-max/laotzu101` |
 | Branch | `main` (aligned with `release/1.0.1-one-slip`) |
-| Git base | `0972bcc` on `main` |
-| This archive | **Working tree** (not yet pushed): settings `#remindStatus`, dead-code cleanup in `logic-journey.js`, SW `king-v321` |
-| Generated | 2026-09-24 |
+| Git base | `5805c54` on `main` (pushed to `laotzu101`) |
+| Service worker | `king-v364` (`sw.js` `CACHE_NAME`) |
+| Generated | 2026-09-25 |
 | npm `package.json` `version` | `1.0.1` (aligned with Android) |
 | Android `versionName` | `1.0.1` |
 | Android `versionCode` | `4` |
@@ -20,9 +20,10 @@
 
 - Capacitor **Android** wrapper around the King PWA (repo-root HTML/CSS/JS → `www/` + `android/app/src/main/assets/public/` via `npm run web:copy`).
 - **Play billing** path present (`billing-store-play.js`, native `KingBilling`); reminders and backup are **premium-gated** on native.
-- **Settings** (gear): top-anchored sheet — daily reminder (`#remindStatus` for native permission/premium copy), export/import, privacy, reset; header with logo + “King” + plain settings icon.
+- **Settings** (gear): top-anchored sheet — **How King Works** and collapsible **Premium**, daily reminder (`#remindStatus` for native permission/premium copy), export/import, privacy, reset; header with logo + “King” + plain settings icon. Home no longer shows separate Learn/Premium cards.
+- **Progress tab:** Monthly Mirror, **Best Performances** (top-3 streaks & journeys with explicit tie-breakers), collapsible Progress Graph, lifetime stats — heavy sections default collapsed.
 - **Privacy:** `public/privacy.html` copied into native bundles by `scripts/copy-web.js`.
-- **Notifications:** Android reminder channel (private); see `reminder.js` and native notifier if present in `android/`.
+- **Notifications:** Android reminder channel (private); see `reminder.js` and native notifier under `android/`.
 
 ## Regenerate a clean review archive
 
@@ -46,16 +47,16 @@ Output: `King-<version>-code-review-<date>.zip` in the repo root and a copy on y
 
 1. **Store policy & privacy** — Data stays on device; backup is user-initiated JSON; privacy page matches in-app links.
 2. **Permissions** — `AndroidManifest.xml`: only what reminder, backup share, and billing need.
-3. **Billing** — Subscription/trial copy in UI matches Play product setup; restore/purchase error paths; premium gates on reminder + backup.
-4. **Settings UX** — Sheet covers home when open; no leaked PII in UI; reset flow confirms destruction.
-5. **Regression** — Journey logging, slip flow, Progress tab, onboarding still coherent after settings move.
-6. **Release hygiene** — `versionCode` bumped; `minifyEnabled` / ProGuard notes in `app/build.gradle`; no debug endpoints.
+3. **Billing** — Subscription/trial copy in UI matches Play product setup; restore/purchase error paths; premium gates on reminder + backup + Best Performances panel.
+4. **Settings UX** — Sheet covers home when open; Learn/Premium live in settings; no leaked PII in UI; reset flow confirms destruction.
+5. **Regression** — Journey logging, slip flow, Progress tab (including Best Performances ranking), onboarding still coherent.
+6. **Release hygiene** — `versionCode` bumped when shipping; `minifyEnabled` / ProGuard notes in `app/build.gradle`; no debug endpoints.
 
 ## Commands reviewers can run
 
 ```bash
 npm install
-npm test   # 93 tests (node --test, tests/*.test.js)
+npm test   # 95 tests (node --test, tests/*.test.js)
 npm run web:copy
 npm run android:debug          # needs JDK + Android SDK; may download Gradle once
 npm run android:bundle         # release AAB; needs keystore.properties locally
