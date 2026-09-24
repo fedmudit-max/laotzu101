@@ -23,9 +23,20 @@
 - **Privacy:** `public/privacy.html` copied into native bundles by `scripts/copy-web.js`.
 - **Notifications:** Android reminder channel (private); see `reminder.js` and native notifier if present in `android/`.
 
+## Regenerate a clean review archive
+
+From repo root (excludes all `build/`, `.gradle`, keystores, `node_modules`):
+
+```bash
+npm run review:zip
+```
+
+Output: `King-<version>-code-review-<date>.zip` in the repo root and a copy on your Desktop. The script fails if any `/build/` path slips into the zip.
+
 ## What is **not** in this zip
 
 - `node_modules/` — run `npm ci` or `npm install` at repo root.
+- **Gradle `build/` outputs** — not included (review hygiene).
 - Upload keystore / `android/keystore.properties` — local only; see `android/RELEASE_SIGNING.md`.
 - Signed **AAB** — build locally: `npm run android:bundle` → `android/app/build/outputs/bundle/release/app-release.aab`.
 - Gradle wrapper download may need network on first build (see `GPT-REVIEW.md`).

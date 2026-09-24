@@ -14,3 +14,7 @@ Release command: `npm run android:bundle` → `npm run web:copy` then Gradle `:a
 - **Signed AAB**: upload keystore and `android/keystore.properties` are local-only (not in this zip). Maintainer validates `BUILD SUCCESSFUL`, `signReleaseBundle`, and `android/app/build/outputs/bundle/release/app-release.aab`.
 
 See `android/RELEASE_SIGNING.md` for the maintainer checklist.
+
+## Review ZIP (no build artifacts)
+
+Maintainers: `npm run review:zip` — runs `web:copy` then zips the tree with excludes for `android/**/build/`, `.gradle`, keystores, and `node_modules`. Do not hand-zip the repo after a local Gradle build without those excludes.
