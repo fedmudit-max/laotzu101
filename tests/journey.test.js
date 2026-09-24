@@ -81,7 +81,6 @@ test('next journey target after first journey with 12 strong days', () => {
         bestJourney: { success: 12, failures: 10 },
     });
 
-    assert.equal(ctx.formatNextJourneyTargetLine(2), 'Journey 2: Beat 12 Strong Days to Win');
     assert.equal(ctx.getNextJourneyTargetGoal(), 'Beat 12 Strong Days to Win');
 });
 
@@ -100,7 +99,6 @@ test('next journey target after first journey with 26 strong days', () => {
         bestJourney: { success: 26, failures: 10 },
     });
 
-    assert.equal(ctx.formatNextJourneyTargetLine(2), 'Journey 2: Beat 26 Strong Days to Win');
     assert.equal(ctx.getNextJourneyTargetGoal(), 'Beat 26 Strong Days to Win');
 });
 
@@ -128,7 +126,6 @@ test('next journey target keeps all-time best when latest journey scores lower',
     });
 
     assert.equal(ctx.getNextJourneyTargetGoal(), 'Beat 26 Strong Days to Win');
-    assert.equal(ctx.formatNextJourneyTargetLine(3), 'Journey 3: Beat 26 Strong Days to Win');
 });
 
 test('next journey target uses new best when latest journey beats prior best', () => {
@@ -172,7 +169,7 @@ test('next journey target after first journey with no strong days', () => {
         bestJourney: { success: 0, failures: 10 },
     });
 
-    assert.equal(ctx.formatNextJourneyTargetLine(2), 'Journey 2: Target 25 strong days');
+    assert.equal(ctx.getNextJourneyTargetGoal(), 'Target 25 strong days');
 });
 
 test('first journey archive has no prior best but still returns comparison', () => {

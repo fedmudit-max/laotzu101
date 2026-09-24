@@ -523,20 +523,6 @@ function getNextTargetAfterMilestoneHit(fixedDay, s) {
     return nextFixed;
 }
 
-function getActiveJourneyTargetDay(curS, s) {
-    s = s || state;
-    curS = Math.max(0, Math.floor(Number(curS) || 0));
-    var priorBest = getCompletedJourneysBestSuccess(s);
-    var nextFixed = getNextStandardMilestoneDay(curS);
-    if (!priorBest) return nextFixed;
-
-    var candidates = [];
-    if (nextFixed != null) candidates.push(nextFixed);
-    if (priorBest > curS) candidates.push(priorBest);
-    if (!candidates.length) return null;
-    return Math.min.apply(null, candidates);
-}
-
 function isOnNewBestJourney(s) {
     s = s || state;
     var prior = bestScoreFromCompletedJourneys(s.completedJourneys || []);
@@ -607,12 +593,6 @@ function getNextJourneyTargetGoal(s) {
     var n = Math.max(0, Number(best.success) || 0);
     if (n > 0) return formatStrongDaysToWinLabel(n, false);
     return 'Target 25 strong days';
-}
-
-function formatNextJourneyTargetLine(nextAttempt, s) {
-    s = s || state;
-    nextAttempt = Math.max(2, Math.floor(Number(nextAttempt) || 2));
-    return 'Journey ' + nextAttempt + ': ' + getNextJourneyTargetGoal(s);
 }
 
 function resolveJourneyMilestoneHit(successCount) {
