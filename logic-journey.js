@@ -456,7 +456,7 @@ function getJourneyMilestoneDisplayCount(day) {
 
 function formatJourneyMilestoneStatus(day) {
     var n = getJourneyMilestoneDisplayCount(day);
-    return n > 0 ? String(n) : '—';
+    return n > 0 ? String(n) : '';
 }
 
 function getJourneyMilestonesRenderKey(s) {

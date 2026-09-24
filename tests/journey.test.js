@@ -295,14 +295,14 @@ test('journey milestone status hides zero achievement count', () => {
     resetKing(ctx, { today });
     seedJourney(ctx, { today, start });
 
-    assert.equal(ctx.formatJourneyMilestoneStatus(25), '—');
-    assert.equal(ctx.formatJourneyMilestoneStatus(50), '—');
+    assert.equal(ctx.formatJourneyMilestoneStatus(25), '');
+    assert.equal(ctx.formatJourneyMilestoneStatus(50), '');
 
     for (let i = 0; i < 25; i++) {
         ctx.applyStrongDay({ logDate: ctx.addDaysToKey(start, i), suppressUI: true });
     }
     assert.equal(ctx.formatJourneyMilestoneStatus(25), '1');
-    assert.equal(ctx.formatJourneyMilestoneStatus(50), '—');
+    assert.equal(ctx.formatJourneyMilestoneStatus(50), '');
 });
 
 test('warrior unlock hint shows day count on first locked row only', () => {
