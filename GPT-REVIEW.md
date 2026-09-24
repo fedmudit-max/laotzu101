@@ -22,4 +22,4 @@ Maintainers: `npm run review:zip` — runs `web:copy` then zips the tree with ex
 ## Version and tests (1.0.1)
 
 - **`package.json` `version`** matches Android **`versionName` `1.0.1`** (`versionCode` **4** in `android/app/build.gradle`).
-- **`npm test`**: **79** passing tests (`tests/*.test.js`). Update docs if the count changes.
+- **`npm test`**: **93** passing tests (`tests/*.test.js`). Update docs if the count changes.

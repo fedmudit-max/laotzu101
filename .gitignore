@@ -4,9 +4,6 @@ node_modules/
 # Generated web bundle (canonical source is repo root; scripts/copy-web.js)
 www/
 
-# Local dev helpers (not shipped)
-dev-next-day.js
-
 # OS junk
 .DS_Store
 __MACOSX/

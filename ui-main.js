@@ -8,9 +8,11 @@ let currentTab = 0;
 let chartPage = -1;
 let chartMode = 'streaks';
 let monthOffset = 0;
-let monthPanelOpen = true;
+let monthPanelOpen = false;
 let chartPanelOpen = false;
 let lifetimePanelOpen = false;
+let bestPerformancesPanelOpen = false;
+let bestPerformancesMode = 'streaks';
 let toastTimer = null;
 let confettiParticles = [];
 let confettiAnimId    = null;
@@ -115,6 +117,7 @@ function renderAll(options) {
             renderKnowledgeCard,
             renderLifetimeStats,
             renderMonthGrid,
+            renderBestPerformances,
             renderChart,
         );
     }
@@ -138,6 +141,7 @@ function renderDeferredHeavy() {
         renderKnowledgeCard,
         renderLifetimeStats,
         renderMonthGrid,
+        renderBestPerformances,
         renderChart,
     ];
     for (const job of jobs) {

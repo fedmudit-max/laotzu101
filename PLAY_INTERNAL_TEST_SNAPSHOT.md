@@ -55,7 +55,7 @@ Output: `King-<version>-code-review-<date>.zip` in the repo root and a copy on y
 
 ```bash
 npm install
-npm test   # 79 tests (node --test, tests/*.test.js)
+npm test   # 93 tests (node --test, tests/*.test.js)
 npm run web:copy
 npm run android:debug          # needs JDK + Android SDK; may download Gradle once
 npm run android:bundle         # release AAB; needs keystore.properties locally

@@ -34,6 +34,7 @@ function applyPremiumTierLayout() {
         'milestonesCard',
         'knowledgeCard',
         'monthPanelCard',
+        'bestPerformancesPanelCard',
         'chartPanelCard',
         'settingsReminderSection',
     ];

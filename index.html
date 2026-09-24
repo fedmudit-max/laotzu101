@@ -193,13 +193,13 @@
 
     <!-- ═══ MONTHLY MIRROR (collapsible) ═══════════════════ -->
     <div class="card collapse-card" id="monthPanelCard">
-        <button type="button" class="collapse-header" id="monthPanelToggle" aria-expanded="true" aria-controls="monthPanelBody">
+        <button type="button" class="collapse-header" id="monthPanelToggle" aria-expanded="false" aria-controls="monthPanelBody">
             <span class="collapse-header-row">
                 <span class="collapse-title">Monthly Mirror</span>
-                <span class="collapse-chevron open" id="monthPanelChevron" aria-hidden="true">›</span>
+                <span class="collapse-chevron" id="monthPanelChevron" aria-hidden="true">›</span>
             </span>
         </button>
-        <div class="collapse-body is-open" id="monthPanelBody">
+        <div class="collapse-body" id="monthPanelBody">
             <div class="chart-header">
                 <button class="month-nav-btn" id="monthNavPrev" data-action="month-prev">‹</button>
                 <div style="text-align:center;">
@@ -223,6 +223,28 @@
                     <span class="legend-swatch slip" aria-hidden="true"></span>
                     <span class="month-stat-slip" id="monthSlipStat">0 slips</span>
                 </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ BEST PERFORMANCES (collapsible) ══════════════ -->
+    <div class="card collapse-card" id="bestPerformancesPanelCard">
+        <button type="button" class="collapse-header" id="bestPerformancesPanelToggle" aria-expanded="false" aria-controls="bestPerformancesPanelBody">
+            <span class="collapse-header-row">
+                <span class="collapse-title">Best Performances</span>
+                <span class="collapse-chevron" id="bestPerformancesPanelChevron" aria-hidden="true">›</span>
+            </span>
+        </button>
+        <div class="collapse-body" id="bestPerformancesPanelBody">
+            <div class="chart-toggle" id="bestPerformancesModeToggle">
+                <button type="button" class="chart-toggle-btn active" id="bestPerfToggleStreaks" data-action="best-perf-streaks">Streaks</button>
+                <button type="button" class="chart-toggle-btn" id="bestPerfToggleJourneys" data-action="best-perf-journeys">Journeys</button>
+            </div>
+            <div class="best-perf-pane" id="bestStreaksPane">
+                <div class="best-perf-list" id="bestStreaksList" role="list" aria-label="Best streaks"></div>
+            </div>
+            <div class="best-perf-pane" id="bestJourneysPane" hidden>
+                <div class="best-perf-list" id="bestJourneysList" role="list" aria-label="Best journeys"></div>
             </div>
         </div>
     </div>
@@ -355,7 +377,7 @@
                         <span class="settings-row-icon settings-row-icon-green" aria-hidden="true">↑</span>
                         <span class="settings-row-text">
                             <span class="settings-row-title">Export progress</span>
-                            <span class="settings-row-sub">Save a JSON backup</span>
+                            <span class="settings-row-sub">Save a backup file on this device</span>
                         </span>
                         <span class="settings-row-chevron" aria-hidden="true">›</span>
                     </button>
@@ -787,6 +809,7 @@
     <script defer src="./logic-journey.js"></script>
     <script defer src="./logic-streak.js"></script>
     <script defer src="./logic-logging.js"></script>
+    <script defer src="./logic-best-performances.js"></script>
     <script defer src="./entitlement.js"></script>
     <script defer src="./billing-offers.js"></script>
     <script defer src="./billing-store-play.js"></script>
