@@ -1,5 +1,6 @@
 /**
- * ui-day.js — Day logic, progress cards, first-launch setup.
+ * ui-day.js — Day logic, progress cards, onboarding.
+ * Edit here: yesterday reminder, multi-day catch-up, brain/knowledge cards, onboarding.
  */
 
 // ════════════════════════════════════════════════════════
@@ -145,16 +146,7 @@ function logYesterday(result) {
         // End date = yesterday when the 10th slip is attributed to N-1 (not open day N).
         if (slipResult && slipResult.applied && journeyIsOver(state)) {
             completeEndJourney(yKey);
-            return;
-        }
-        if (slipResult && slipResult.applied) {
-            clampCalendarDayToRealToday();
-            state.lastOpenedDate = todayKey();
-            state.lastCheckedDate = todayKey();
-            chartPage = -1;
-            saveToStorage(state);
-            renderAll();
-            showSlipLoggedCelebration(slipResult.failures);
+            showToast(0, '10 Powers used. Journey complete.');
             return;
         }
     }
@@ -310,29 +302,21 @@ function renderKnowledgeCard() {
 }
 
 // ════════════════════════════════════════════════════════
-//  ONBOARDING (first launch — 2 screens)
+//  ONBOARDING
 // ════════════════════════════════════════════════════════
 
-const ONBOARDING_SLIDE_COUNT = 2;
-let onboardingSlide = 0;
 
+/** Reset slides/dots to first screen (needed after reset — DOM keeps last active slide). */
 function resetOnboardingUI() {
-    onboardingSlide = 0;
-    for (var i = 0; i < ONBOARDING_SLIDE_COUNT; i++) {
+    currentSlide = 0;
+    for (var i = 0; i < TOTAL_SLIDES; i++) {
         var slide = document.getElementById('slide-' + i);
         var dot = document.getElementById('dot-' + i);
         if (slide) slide.classList.toggle('active', i === 0);
         if (dot) dot.classList.toggle('active', i === 0);
     }
-    updateOnboardingBtn();
-}
-
-function updateOnboardingBtn() {
     var btn = document.getElementById('onboardingBtn');
-    if (!btn) return;
-    btn.textContent = onboardingSlide === ONBOARDING_SLIDE_COUNT - 1
-        ? 'Start Your Journey →'
-        : 'Next →';
+    if (btn) btn.textContent = 'Next →';
 }
 
 function checkOnboarding() {
@@ -340,10 +324,10 @@ function checkOnboarding() {
     if (!overlay) return;
 
     var topBar = document.getElementById('appTopBar');
-    var onboardingDone = !!safeGet('onboardingComplete');
-    if (topBar) topBar.hidden = !onboardingDone;
-
-    if (!onboardingDone) {
+    const done = safeGet('onboardingComplete');
+    if (topBar) topBar.hidden = !done;
+    document.body.classList.toggle('king-onboarding', !done);
+    if (!done) {
         resetOnboardingUI();
         overlay.style.display = 'flex';
         overlay.style.pointerEvents = 'auto';
@@ -355,30 +339,41 @@ function checkOnboarding() {
 }
 
 function onboardingNext() {
-    if (onboardingSlide < ONBOARDING_SLIDE_COUNT - 1) {
-        document.getElementById('slide-' + onboardingSlide).classList.remove('active');
-        document.getElementById('dot-' + onboardingSlide).classList.remove('active');
-        onboardingSlide++;
-        document.getElementById('slide-' + onboardingSlide).classList.add('active');
-        document.getElementById('dot-' + onboardingSlide).classList.add('active');
-        updateOnboardingBtn();
-        return;
+    if (currentSlide < TOTAL_SLIDES - 1) {
+        // Go to next slide
+        document.getElementById(`slide-${currentSlide}`).classList.remove('active');
+        document.getElementById(`dot-${currentSlide}`).classList.remove('active');
+        currentSlide++;
+        document.getElementById(`slide-${currentSlide}`).classList.add('active');
+        document.getElementById(`dot-${currentSlide}`).classList.add('active');
+
+        // Last slide — final CTA
+        if (currentSlide === TOTAL_SLIDES - 1) {
+            document.getElementById('onboardingBtn').textContent = 'Start Your Journey →';
+        } else {
+            document.getElementById('onboardingBtn').textContent = 'Next →';
+        }
+    } else {
+        completeOnboarding();
     }
-    completeOnboarding();
 }
 
-/** Ends first launch — trial starts from Calendar Day 1. */
+/** Skip and full slide flow both end here — trial starts from Calendar Day 1 either way. */
 function completeOnboarding() {
     try {
         beginJourneyAfterOnboarding();
         saveToStorage(state);
     } catch (err) {
-        console.error('King first-launch setup failed:', err);
+        console.error('King onboarding save failed:', err);
     }
+
+    document.body.classList.remove('king-onboarding');
 
     const overlay = document.getElementById('onboardingOverlay');
     if (overlay) {
         overlay.classList.add('hidden');
+        // Keep intercepting clicks until fade-out finishes — otherwise the same
+        // “Let’s Begin” / Skip tap falls through (paywall / export / panels).
         setTimeout(function () {
             overlay.style.display = 'none';
             overlay.style.pointerEvents = 'none';
@@ -391,6 +386,7 @@ function completeOnboarding() {
     if (typeof monthPanelOpen !== 'undefined') monthPanelOpen = true;
     if (typeof deferredHeavyRendered !== 'undefined') deferredHeavyRendered = false;
 
+    // Never show paywall immediately after first start.
     if (typeof closePremiumSheet === 'function') closePremiumSheet();
 
     try {
@@ -400,6 +396,6 @@ function completeOnboarding() {
             renderAll();
         }
     } catch (err) {
-        console.error('King first-launch render failed:', err);
+        console.error('King onboarding render failed:', err);
     }
 }

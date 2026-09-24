@@ -91,24 +91,26 @@
         <!-- 10 slips (🛡️ shields) -->
         <div class="chances-card">
             <div class="chances-grid" id="chancesGrid"></div>
-            <div class="chances-label relapse-0" id="chancesLabel">10 slips left</div>
+            <div class="chances-label relapse-0" id="chancesLabel">🛡️ 10 slips left</div>
         </div>
 
         <!-- Action buttons -->
         <div class="action-buttons">
             <button class="btn-success" id="successBtn" data-action="success">✓ I STAYED STRONG TODAY</button>
-            <button class="btn-danger"  id="failBtn"    data-action="modal-fail">✕ I SLIPPED TODAY</button>
+            <button class="btn-danger"  id="failBtn"    data-action="modal-fail">✕ I Slipped</button>
             <button class="btn-urge" data-action="urge">🌊 I Feel the Urge</button>
         </div>
     </div>
 
     <!-- ═══ WEEKLY STREAK CARD ═════════════════════════════ -->
     <div class="card weekly-streak-card" id="weeklyStreakCard">
-        <div class="weekly-streak-insight">
+        <div class="weekly-streak-track" id="weeklyStreakTrack"></div>
+        <div class="weekly-streak-insight" id="weeklyStreakInsight">
+            <div class="weekly-streak-insight-label">What did you do?</div>
             <div class="weekly-streak-day-title" id="weeklyStreakDayTitle"></div>
+            <div class="weekly-streak-day-state" id="weeklyStreakDayState" hidden></div>
             <div class="weekly-streak-day-text" id="weeklyStreakDayText"></div>
         </div>
-        <div class="weekly-streak-track" id="weeklyStreakTrack"></div>
         <div class="weekly-streak-tagline">One Week at a Time</div>
     </div>
 
@@ -116,7 +118,7 @@
     <div class="card" id="milestonesCard">
         <div class="tabs">
             <button type="button" class="tab active" data-action="tab-0">Streak</button>
-            <button type="button" class="tab"        data-action="tab-1">Milestone</button>
+            <button type="button" class="tab"        data-action="tab-1">Journey</button>
             <button type="button" class="tab"        data-action="tab-2">Progress</button>
         </div>
 
@@ -317,6 +319,8 @@
         <div class="collapse-body" id="premiumPanelBody">
             <div class="premium-panel-inner">
                 <p class="premium-panel-status" id="premiumPanelStatus"></p>
+                <ul class="premium-panel-features" id="premiumPanelFeatures"></ul>
+                <p class="premium-backup-note" id="premiumPanelBackupNote"></p>
                 <button class="btn-premium-panel" type="button" id="premiumPanelSubscribeBtn" data-action="open-premium">View plans &amp; subscribe</button>
             </div>
         </div>
@@ -391,6 +395,20 @@
     </div>
 </div>
 
+<!-- ── Privacy policy (in-app) ── -->
+<div class="overlay privacy-overlay learn-journey-overlay" id="privacyOverlay" aria-hidden="true" role="presentation">
+    <div class="overlay-card learn-journey-card-panel privacy-panel" role="dialog" aria-modal="true" aria-labelledby="privacyOverlayTitle" onclick="event.stopPropagation()">
+        <div class="learn-journey-header">
+            <h2 class="learn-journey-title" id="privacyOverlayTitle">Privacy Policy</h2>
+            <button type="button" class="learn-journey-close" data-action="close-privacy" aria-label="Close privacy policy">✕</button>
+        </div>
+        <div class="learn-journey-scroll privacy-scroll" id="privacyOverlayBody">
+            <p class="privacy-loading">Loading…</p>
+        </div>
+        <button type="button" class="btn-learn-done" data-action="close-privacy">Done</button>
+    </div>
+</div>
+
 <!-- ── How King Works ── -->
 <div class="overlay learn-journey-overlay" id="learnJourneyOverlay" aria-hidden="true" role="presentation">
     <div class="overlay-card learn-journey-card-panel" role="dialog" aria-modal="true" aria-labelledby="learnJourneyTitle">
@@ -402,8 +420,18 @@
 
             <section class="learn-section">
                 <h3 class="learn-section-title">Log Every Day</h3>
-                <p class="learn-section-body">Didn't watch porn or relapse?<br>→ Tap <span class="learn-log-strong">I Stayed Strong Today</span></p>
-                <p class="learn-section-body">Watched porn or relapsed?<br>→ Tap <span class="learn-log-slip">I Slipped Today</span></p>
+                <p class="learn-section-body">If you didn't watch porn or relapse, tap <span class="learn-log-strong">I Stayed Strong Today</span>.</p>
+                <p class="learn-section-body">When you tap <span class="learn-log-strong">I Stayed Strong</span>, you're not just logging a day.</p>
+                <p class="learn-section-body">You're registering proof.</p>
+                <p class="learn-section-body">Every thought you fought. Every impulse you didn't react to. Every moment you chose differently.</p>
+                <p class="learn-section-body">It counts. It's recorded. It's part of your history.</p>
+
+                <p class="learn-section-body">If you watched porn or relapsed, tap <span class="learn-log-slip">I Slipped</span>.</p>
+                <p class="learn-section-body">When you tap <span class="learn-log-slip">I Slipped</span>, you're being honest.</p>
+                <p class="learn-section-body">You acknowledge what happened. You take responsibility.</p>
+                <p class="learn-section-body">Don't hide the number. Log it.</p>
+
+                <p class="learn-section-body">It's here to show you the truth — so you can understand where you are, learn from it, and keep moving forward.</p>
             </section>
 
             <section class="learn-section">
@@ -534,7 +562,8 @@
                 <h3 class="learn-section-title">What You Need to Do</h3>
                 <p class="learn-section-body">Keep it simple.</p>
                 <p class="learn-section-body"><strong>Record every strong day. Record every slip.</strong></p>
-                <p class="learn-section-body">If you slip, log it once for that day.</p>
+                <p class="learn-section-body">If you slip once, log it.</p>
+                <p class="learn-section-body">If you slip three times in a day, log all three.</p>
                 <p class="learn-section-body">Be honest with numbers.</p>
                 <p class="learn-section-body">They show where you really are.</p>
                 <p class="learn-section-body">Every Journey teaches you something.</p>
@@ -587,63 +616,74 @@
     </div>
 </div>
 
-<!-- ── Onboarding (first launch — 2 screens) ── -->
+<!-- ── Onboarding ── -->
 <div class="onboarding-overlay hidden" id="onboardingOverlay" style="display:none">
     <div class="onboarding-card">
+
+        <div class="onboarding-slides" id="onboardingSlides">
+        <!-- Slide 1 — Welcome -->
         <div class="onboarding-slide active" id="slide-0">
-            <div class="onboarding-body onboarding-log-intro">
-                <p>Didn't watch porn or relapse?<br>→ Tap <button type="button" class="btn-success onboarding-inline-log-btn" tabindex="-1" aria-hidden="true">✓ I STAYED STRONG TODAY</button><br><span class="onboarding-log-effect onboarding-log-effect-strong">Stayed strong → +1 strong day</span></p>
-                <p>Watched porn or relapsed?<br>→ Tap <button type="button" class="btn-danger onboarding-inline-log-btn" tabindex="-1" aria-hidden="true">✕ I SLIPPED TODAY</button><br><span class="onboarding-log-effect onboarding-log-effect-slip">Slipped → uses 1 of the 10 slips</span></p>
-            </div>
+            <div class="onboarding-emoji">👑</div>
+            <div class="onboarding-title">Welcome to King</div>
+            <div class="onboarding-body">This is not another streak app. King is built different—for the long journey, not the perfect streak.</div>
         </div>
 
+        <!-- Slide 2 — The problem -->
         <div class="onboarding-slide" id="slide-1">
-            <div class="onboarding-body onboarding-journey-scroll">
-                <div class="onb-journey-formula-box">A Journey is total strong days against 10 slips.</div>
-                <div class="onb-journey-example-divider">— Example —</div>
+            <div class="onboarding-emoji">💔</div>
+            <div class="onboarding-title">Fail Forward, Not Backward</div>
+            <div class="onboarding-body">Most apps reset everything on one slip. King doesn't. A slip is not the end — it's data. You learn, you adjust, you keep moving forward.</div>
+        </div>
 
-                <table class="onb-journey-example-table" aria-label="Example journeys">
-                    <thead>
-                        <tr>
-                            <th scope="col">Journey</th>
-                            <th scope="col">Strong days</th>
-                            <th scope="col">Slips</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>25</td>
-                            <td>10</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>40</td>
-                            <td>10</td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>70</td>
-                            <td>10</td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td>100</td>
-                            <td>10</td>
-                        </tr>
-                    </tbody>
-                </table>
+        <!-- Slide 3 — The journey system -->
+        <div class="onboarding-slide" id="slide-2">
+            <div class="onboarding-emoji">🛡️</div>
+            <div class="onboarding-title">10 Slips Per Journey</div>
+            <div class="onboarding-body">A slip costs one 🛡️ — not your whole journey. You have 10 slips per journey. Your journey ends only when all 10 are used. Then a new one begins.</div>
+        </div>
 
-                <p class="onb-journey-goal">Goal: Build More Strong Days Than Your Last Journey</p>
+        <!-- Slide 4 — Progress not perfection -->
+        <div class="onboarding-slide" id="slide-3">
+            <div class="onboarding-emoji">📈</div>
+            <div class="onboarding-title">Progress, Not Perfection</div>
+            <div class="onboarding-journey-compare" aria-label="Example journey improvement">
+                <div class="onb-journey-card">
+                    <div class="onb-journey-label">Journey 1</div>
+                    <div class="onb-journey-row"><span>Strong Days</span><strong>25</strong></div>
+                    <div class="onb-journey-row"><span>Relapses</span><strong>10</strong></div>
+                    <div class="onb-journey-row onb-journey-score"><span>Score</span><strong>25</strong></div>
+                </div>
+                <div class="onb-journey-arrow" aria-hidden="true">↓</div>
+                <div class="onb-journey-card onb-journey-card-better">
+                    <div class="onb-journey-label">Journey 2</div>
+                    <div class="onb-journey-row"><span>Strong Days</span><strong>30</strong></div>
+                    <div class="onb-journey-row"><span>Relapses</span><strong>10</strong></div>
+                    <div class="onb-journey-row onb-journey-score"><span>Score</span><strong>30</strong></div>
+                </div>
+                <p class="onb-journey-verdict">You have improved 20%</p>
             </div>
         </div>
 
+        <!-- Slide 5 — The destination -->
+        <div class="onboarding-slide" id="slide-4">
+            <div class="onboarding-emoji">🦁</div>
+            <div class="onboarding-title">Become the King</div>
+            <div class="onboarding-body">Strong → Warrior → King. Every day you log is a step. Every urge you resist is proof. The crown isn't given — it's earned. Your journey starts now.</div>
+        </div>
+        </div>
+
+        <!-- Dots -->
         <div class="onboarding-dots">
             <div class="onboarding-dot active" id="dot-0"></div>
             <div class="onboarding-dot" id="dot-1"></div>
+            <div class="onboarding-dot" id="dot-2"></div>
+            <div class="onboarding-dot" id="dot-3"></div>
+            <div class="onboarding-dot" id="dot-4"></div>
         </div>
 
-        <button type="button" class="onboarding-next" id="onboardingBtn" data-action="onboardingNext">Next →</button>
+        <!-- Buttons -->
+        <button class="onboarding-next" id="onboardingBtn" data-action="onboardingNext">Next →</button>
+        <button class="onboarding-skip" data-action="onboardingSkip">Skip</button>
     </div>
 </div>
 
@@ -726,7 +766,8 @@
                 <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(52,199,89,0.15)" stroke-width="6"/>
                 <circle cx="60" cy="60" r="54" fill="none" stroke="#34c759" stroke-width="6"
                     stroke-dasharray="339" stroke-dashoffset="339"
-                    stroke-linecap="round" id="breathRing"/>
+                    stroke-linecap="round" id="breathRing"
+                    style="transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset 4s ease-in-out"/>
                 <text x="60" y="56" text-anchor="middle" font-size="13" font-weight="600"
                     fill="#34c759" font-family="-apple-system,sans-serif" id="breathLabel">Breathe in</text>
                 <text x="60" y="73" text-anchor="middle" font-size="22" font-weight="700"
@@ -736,7 +777,7 @@
 
         <div class="urge-phase" id="urgePhase">Inhale slowly for 4 seconds…</div>
 
-        <button class="btn-success" data-action="closeUrge">Close</button>
+        <button class="btn-urge-cancel" data-action="closeUrge">Close</button>
     </div>
 </div>
 
@@ -769,6 +810,7 @@
     <script defer src="./backup.js"></script>
     <script defer src="./reminder.js"></script>
     <script defer src="./ui-main.js"></script>
+    <script defer src="./privacy-content.js"></script>
     <script defer src="./ui-overlays.js"></script>
     <script defer src="./ui-actions.js"></script>
     <script defer src="./ui-history.js"></script>
