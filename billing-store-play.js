@@ -128,7 +128,7 @@ function loadPlayOffers() {
         if (overlay && overlay.classList.contains('active')) {
             showPremiumModal({ plans: plans, source: 'play' });
         }
-        if (premiumPanelOpen) renderPremiumPanelContent();
+        if (typeof renderPremiumPanelContent === 'function') renderPremiumPanelContent();
     }).catch(function () {
         if (!storePremiumOffer) premiumOfferLoadState = 'unavailable';
         refreshPremiumOfferUiIfVisible();

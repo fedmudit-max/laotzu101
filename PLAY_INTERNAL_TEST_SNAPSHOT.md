@@ -11,6 +11,7 @@
 | Git base | `0972bcc` on `main` |
 | This archive | **Working tree** (not yet pushed): settings `#remindStatus`, dead-code cleanup in `logic-journey.js`, SW `king-v321` |
 | Generated | 2026-09-24 |
+| npm `package.json` `version` | `1.0.1` (aligned with Android) |
 | Android `versionName` | `1.0.1` |
 | Android `versionCode` | `4` |
 | Application ID | `com.kingtracker.app` (verify in `android/app/build.gradle`) |
@@ -54,7 +55,7 @@ Output: `King-<version>-code-review-<date>.zip` in the repo root and a copy on y
 
 ```bash
 npm install
-npm test
+npm test   # 79 tests (node --test, tests/*.test.js)
 npm run web:copy
 npm run android:debug          # needs JDK + Android SDK; may download Gradle once
 npm run android:bundle         # release AAB; needs keystore.properties locally

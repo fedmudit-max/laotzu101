@@ -264,6 +264,8 @@ If buttons feel dead, check **queries before UI:** `canLogToday()`, `isYesterday
 npm test
 ```
 
+**79** tests across `tests/*.test.js` (`node --test --test-concurrency=1`).
+
 Harness loads `constants`, `data`, `migration`, `logic`, `entitlement`, `backup`, `billing-offers` / `billing-store-play` / `billing-ui` in a VM (`tests/helpers/king-harness.js`). Use `createKingContext()` and `getState(ctx)` — `state` is not a normal sandbox export.
 
 #### After app-visible JS changes

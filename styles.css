@@ -200,13 +200,14 @@ body::before {
 .settings-sheet-scroll {
     margin-top: 0;
     flex: 1 1 auto;
-    overflow: visible;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     padding: 0 0 4px;
     min-height: 0;
 }
 
 .settings-block {
-    margin-bottom: 14px;
+    margin-bottom: 20px;
 }
 
 .settings-block:last-child {
@@ -227,6 +228,20 @@ body::before {
     line-height: 1.35;
     color: var(--text-muted);
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.settings-group-note--footer {
+    border-bottom: none;
+    padding-bottom: 10px;
+}
+
+.settings-group-danger {
+    background: rgba(255, 59, 48, 0.06);
+    box-shadow: 0 1px 3px rgba(255, 59, 48, 0.08);
+}
+
+.settings-block-danger {
+    margin-bottom: 8px;
 }
 
 .settings-remind-head {
@@ -331,6 +346,13 @@ body::before {
     font-size: 11px;
 }
 
+.settings-row-app-logo {
+    display: block;
+    padding: 0;
+    object-fit: cover;
+    background: transparent;
+}
+
 .settings-row-icon-danger {
     background: rgba(255, 59, 48, 0.12);
     color: #ff3b30;
@@ -348,6 +370,74 @@ body::before {
     letter-spacing: -0.2px;
     color: var(--text);
     line-height: 1.25;
+}
+
+.settings-group-premium {
+    padding: 14px 14px 16px;
+}
+
+.settings-group-premium-collapse {
+    padding: 0;
+    overflow: hidden;
+}
+
+.settings-premium-collapse-header {
+    padding: 14px;
+    box-sizing: border-box;
+}
+
+.settings-premium-collapse-header .settings-premium-title {
+    display: block;
+}
+
+.settings-premium-collapse-body.collapse-body {
+    border-top: none;
+    padding: 0 14px 16px;
+}
+
+.settings-premium-teaser:empty {
+    display: none;
+    margin: 0;
+}
+
+.settings-premium-header {
+    margin-bottom: 10px;
+}
+
+.settings-premium-title {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+    color: var(--text);
+}
+
+.settings-premium-teaser {
+    margin-top: 4px;
+    font-size: 13px;
+    line-height: 1.35;
+    color: var(--text-muted);
+}
+
+.settings-group-premium .premium-panel-status {
+    margin: 0 0 12px;
+    padding: 0;
+    border: none;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--text-muted);
+}
+
+.settings-premium-cta {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#premiumPanelCard.premium-active-state .settings-premium-title {
+    color: var(--gold);
+}
+
+#premiumPanelCard.premium-trial-state .settings-premium-title {
+    color: var(--green);
 }
 
 .settings-row-sub {
@@ -462,13 +552,6 @@ body::before {
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
 }
 
-#premiumBackupGate {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    row-gap: 8px;
-    width: 100%;
-    border-radius: 12px;
-}
 
 @keyframes fadeUp {
     from { opacity: 0; transform: translateY(20px); }
@@ -708,12 +791,29 @@ body::before {
 
 .learn-journey-header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 12px;
     padding: 20px 18px 12px;
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
+}
+
+.learn-journey-header-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+}
+
+.learn-journey-logo {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    display: block;
+    object-fit: cover;
 }
 
 .learn-journey-title {
@@ -3216,8 +3316,10 @@ button {
 }
 
 .overlay.settings-overlay .settings-sheet {
-    margin: 0;
-    align-self: stretch;
+    margin: 0 auto;
+    align-self: center;
+    width: 100%;
+    max-width: 480px;
     background: transparent;
     border-radius: 0;
     box-shadow: none;

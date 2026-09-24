@@ -1,0 +1,12 @@
+---
+description: This repo is King 1.0.1 (laotzu101) — the default shipping target
+alwaysApply: true
+---
+
+# King 1.0.1 (Laotzu 101)
+
+This workspace is **Play internal testing** (`laotzu101`). All user work here applies to **this repo**.
+
+Do **not** change sibling **`king-nofap`** (open Laotzu / `origin`) unless the user explicitly asks or you have asked and they approved.
+
+See also `laotzu-vs-101-separate` in the Laotzu repo if porting is ever requested.

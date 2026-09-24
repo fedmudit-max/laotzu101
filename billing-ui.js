@@ -9,16 +9,16 @@
  * Reads getPremiumOffer(); checkout/restore call billing-store-play.
  */
 
-let premiumPanelOpen = false;
 let selectedPremiumPlanId = 'annual';
 let lastPremiumModalOpts = null;
+let premiumPanelOpen = false;
 
 function refreshPremiumOfferUiIfVisible() {
     var overlay = document.getElementById('premiumOverlay');
     if (overlay && overlay.classList.contains('active')) {
         showPremiumModal({});
     }
-    if (premiumPanelOpen) renderPremiumPanelContent();
+    renderPremiumPanelContent();
 }
 
 function setPremiumSectionVisible(id, visible) {
@@ -42,7 +42,7 @@ function applyPremiumTierLayout() {
     }
     setPremiumSectionVisible('primaryStack', true);
     setPremiumSectionVisible('appTopBar', true);
-    setPremiumSectionVisible('learnJourneyCard', true);
+    setPremiumSectionVisible('settingsLearnSection', true);
     setPremiumSectionVisible('premiumPanelCard', true);
     setPremiumSectionVisible('settingsDataSection', true);
     setPremiumSectionVisible('exportBackupBtn', true);
@@ -93,10 +93,10 @@ function syncPremiumLockVeil(el, locked) {
 
 function togglePremiumPanel() {
     premiumPanelOpen = !premiumPanelOpen;
-    syncPremiumPanel();
+    syncPremiumPanelCollapse();
 }
 
-function syncPremiumPanel() {
+function syncPremiumPanelCollapse() {
     var body = document.getElementById('premiumPanelBody');
     var chevron = document.getElementById('premiumPanelChevron');
     var toggle = document.getElementById('premiumPanelToggle');
@@ -104,6 +104,10 @@ function syncPremiumPanel() {
     if (chevron) chevron.classList.toggle('open', premiumPanelOpen);
     if (toggle) toggle.setAttribute('aria-expanded', premiumPanelOpen ? 'true' : 'false');
     if (premiumPanelOpen) renderPremiumPanelContent();
+}
+
+function syncPremiumPanel() {
+    renderPremiumPanelContent();
 }
 
 function formatTrialDaysLeft(left) {
@@ -177,7 +181,7 @@ function renderPremiumStatus() {
     }
 
     applyPremiumTierLayout();
-    if (premiumPanelOpen) renderPremiumPanelContent();
+    renderPremiumPanelContent();
 }
 
 function renderPremiumSheet(opts) {
@@ -324,6 +328,7 @@ function showPremiumModal(opts) {
 }
 
 function openPremiumSheet() {
+    if (typeof closeAppSettings === 'function') closeAppSettings();
     var offer = getPremiumOffer();
     showPremiumModal({
         trialDays: offer.trialDays,
@@ -490,6 +495,7 @@ function initPremiumStartup() {
             togglePremiumPanel();
         });
     }
+    syncPremiumPanelCollapse();
     bindPlayPurchasesListener();
     loadPlayOffers();
     refreshPlayPurchasesSilent();
