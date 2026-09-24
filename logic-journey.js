@@ -455,7 +455,8 @@ function getJourneyMilestoneDisplayCount(day) {
 }
 
 function formatJourneyMilestoneStatus(day) {
-    return String(getJourneyMilestoneDisplayCount(day));
+    var n = getJourneyMilestoneDisplayCount(day);
+    return n > 0 ? String(n) : '—';
 }
 
 function getJourneyMilestonesRenderKey(s) {

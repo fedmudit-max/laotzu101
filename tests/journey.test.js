@@ -288,6 +288,23 @@ test('journey milestone labels use strong days wording', () => {
     assert.equal(ctx.formatJourneyMilestoneLabel(200), '200 Strong Days');
 });
 
+test('journey milestone status hides zero achievement count', () => {
+    const ctx = createKingContext();
+    const start = '2026-06-15';
+    const today = '2026-07-09';
+    resetKing(ctx, { today });
+    seedJourney(ctx, { today, start });
+
+    assert.equal(ctx.formatJourneyMilestoneStatus(25), '—');
+    assert.equal(ctx.formatJourneyMilestoneStatus(50), '—');
+
+    for (let i = 0; i < 25; i++) {
+        ctx.applyStrongDay({ logDate: ctx.addDaysToKey(start, i), suppressUI: true });
+    }
+    assert.equal(ctx.formatJourneyMilestoneStatus(25), '1');
+    assert.equal(ctx.formatJourneyMilestoneStatus(50), '—');
+});
+
 test('warrior unlock hint shows day count on first locked row only', () => {
     const ctx = createKingContext();
     resetKing(ctx, { today: '2026-06-15' });
