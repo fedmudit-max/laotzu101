@@ -8,7 +8,7 @@
 |--------|--------|
 | GitHub | `fedmudit-max/laotzu101` |
 | Branch | `main` (aligned with `release/1.0.1-one-slip`) |
-| Git base | `01dd8b5` on `main` (pushed to `laotzu101`) |
+| Git base | `fb0d23a` on `main` (pushed to `laotzu101`) |
 | Service worker | `king-v367` (`sw.js` `CACHE_NAME`) |
 | Generated | 2026-09-25 |
 | npm `package.json` `version` | `1.0.1` (aligned with Android) |
