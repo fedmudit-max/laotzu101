@@ -1,0 +1,24 @@
+# Friends test build — re-enable billing before store test
+
+King 1.0.1 can ship a **friends / early closed-test** mode without prices or Premium UI.
+
+## Flags (`constants.js`)
+
+| Flag | Friends test | Before billing / production test |
+|------|----------------|----------------------------------|
+| `KING_FRIENDS_BUILD_FULL_ACCESS` | `true` | `false` |
+| `KING_SUBSCRIPTION_UI_ENABLED` | `false` | `true` |
+
+When friends mode is on: `Entitlement.hasPremiumAccess()` is true after onboarding; Settings Premium block and paywall are hidden; Play offer load is skipped.
+
+## Do later (user requested reminder)
+
+Before **internal/closed testing with subscriptions** or **production**:
+
+1. Set both flags as in the table above.
+2. Run `npm test` (96+ tests).
+3. `npm run android:install` or release AAB; verify paywall, prices, restore with Play license testers.
+4. Commit with a clear message (e.g. “Re-enable subscription UI for Play billing test”).
+5. Bump `sw.js` `CACHE_NAME` if web assets changed.
+
+Do not delete billing code — only flip flags.

@@ -2,6 +2,14 @@
  * constants.js — App keys, limits, and feature flags.
  */
 
+/**
+ * Friend / early closed-test builds: hide subscribe UI and prices; unlock all features after onboarding.
+ * Before Play billing test: set SUBSCRIPTION_UI true and FRIENDS_FULL_ACCESS false.
+ */
+/** Flipped per release track (friends test vs billing test); not const so harness can override in tests. */
+var KING_SUBSCRIPTION_UI_ENABLED = false;
+var KING_FRIENDS_BUILD_FULL_ACCESS = true;
+
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const MAX_FAILURES = 10;
 const STORAGE_KEY = 'habitTracker_v3';

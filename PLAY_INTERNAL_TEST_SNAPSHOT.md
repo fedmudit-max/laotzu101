@@ -8,7 +8,7 @@
 |--------|--------|
 | GitHub | `fedmudit-max/laotzu101` |
 | Branch | `main` (aligned with `release/1.0.1-one-slip`) |
-| Git base | `1b6fadb` on `main` (pushed to `laotzu101`) |
+| Git base | `a358506` on `main` (pushed to `laotzu101`) |
 | Service worker | `king-v367` (`sw.js` `CACHE_NAME`) |
 | Generated | 2026-09-25 |
 | npm `package.json` `version` | `1.0.1` (aligned with Android) |
@@ -19,7 +19,7 @@
 ## What this build is
 
 - Capacitor **Android** wrapper around the King PWA (repo-root HTML/CSS/JS → `www/` + `android/app/src/main/assets/public/` via `npm run web:copy`).
-- **Play billing** path present (`billing-store-play.js`, native `KingBilling`); reminders and backup are **premium-gated** on native.
+- **Play billing** code present (`billing-store-play.js`, native `KingBilling`); **friends build** may set `KING_FRIENDS_BUILD_FULL_ACCESS` + hide subscription UI in `constants.js` (no prices for testers until flags flipped).
 - **Settings** (gear): top-anchored sheet — **How King Works** and collapsible **Premium**, daily reminder (`#remindStatus` for native permission/premium copy), export/import, privacy, reset; header with logo + “King” + plain settings icon. Home no longer shows separate Learn/Premium cards.
 - **Progress tab:** Monthly Mirror, **Personal Bests** (top-3 streaks & journeys with explicit tie-breakers), collapsible Progress Graph, lifetime stats — heavy sections default collapsed.
 - **Privacy:** `public/privacy.html` copied into native bundles by `scripts/copy-web.js`.

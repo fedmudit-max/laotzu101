@@ -13,6 +13,13 @@ let selectedPremiumPlanId = 'annual';
 let lastPremiumModalOpts = null;
 let premiumPanelOpen = false;
 
+function isSubscriptionCommerceUiEnabled() {
+    if (typeof KING_SUBSCRIPTION_UI_ENABLED !== 'undefined' && !KING_SUBSCRIPTION_UI_ENABLED) {
+        return false;
+    }
+    return true;
+}
+
 function refreshPremiumOfferUiIfVisible() {
     var overlay = document.getElementById('premiumOverlay');
     if (overlay && overlay.classList.contains('active')) {
@@ -44,7 +51,7 @@ function applyPremiumTierLayout() {
     setPremiumSectionVisible('primaryStack', true);
     setPremiumSectionVisible('appTopBar', true);
     setPremiumSectionVisible('settingsLearnSection', true);
-    setPremiumSectionVisible('premiumPanelCard', true);
+    setPremiumSectionVisible('premiumPanelCard', isSubscriptionCommerceUiEnabled());
     setPremiumSectionVisible('settingsDataSection', true);
     setPremiumSectionVisible('exportBackupBtn', true);
     setPremiumSectionVisible('importBackupBtn', true);
@@ -329,6 +336,7 @@ function showPremiumModal(opts) {
 }
 
 function openPremiumSheet() {
+    if (!isSubscriptionCommerceUiEnabled()) return;
     if (typeof closeAppSettings === 'function') closeAppSettings();
     var offer = getPremiumOffer();
     showPremiumModal({
@@ -353,6 +361,7 @@ function requirePremium() {
 }
 
 function startPremiumCheckout() {
+    if (!isSubscriptionCommerceUiEnabled()) return;
     var plugin = getKingBillingPlugin();
     if (!plugin) {
         showToast(0, 'Subscribe uses Google Play on the Android app.');
@@ -416,6 +425,7 @@ function setCheckoutBusy(busy) {
 }
 
 function restorePremiumAccess() {
+    if (!isSubscriptionCommerceUiEnabled()) return;
     var plugin = getKingBillingPlugin();
     if (!plugin) {
         showToast(0, 'Restore uses Google Play on the Android app.');
@@ -497,7 +507,10 @@ function initPremiumStartup() {
         });
     }
     syncPremiumPanelCollapse();
-    bindPlayPurchasesListener();
-    loadPlayOffers();
-    refreshPlayPurchasesSilent();
+    if (isSubscriptionCommerceUiEnabled()) {
+        bindPlayPurchasesListener();
+        loadPlayOffers();
+        refreshPlayPurchasesSilent();
+    }
+    applyPremiumTierLayout();
 }

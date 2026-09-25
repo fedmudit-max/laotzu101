@@ -1,5 +1,6 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
+const vm = require('node:vm');
 const {
     createKingContext,
     resetKing,
@@ -44,6 +45,17 @@ test('active premiumUntil cache grants access', () => {
     assert.equal(ctx.Entitlement.isSubscriptionActive(s), true);
     assert.equal(ctx.Entitlement.hasPremiumAccess(s), true);
     assert.equal(ctx.Entitlement.daysRemaining(s) >= 1, true);
+});
+
+test('friends build flag grants access after onboarding without trial', () => {
+    const ctx = createKingContext();
+    vm.runInContext('KING_FRIENDS_BUILD_FULL_ACCESS = true;', ctx);
+    resetKing(ctx);
+    setState(ctx, { trialStartedAt: isoDaysFromNow(-40), premiumUntil: '' });
+    const s = getState(ctx);
+
+    assert.equal(ctx.Entitlement.hasPremiumAccess(s), true);
+    assert.equal(ctx.Entitlement.shouldShowPaywall(s), false);
 });
 
 test('expired premiumUntil cache denies subscription access', () => {

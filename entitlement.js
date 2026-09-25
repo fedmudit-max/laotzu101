@@ -110,6 +110,9 @@ var Entitlement = (function () {
 
     /** Single access answer: paid subscription OR open trial window. */
     function hasPremiumAccess(s) {
+        if (typeof KING_FRIENDS_BUILD_FULL_ACCESS !== 'undefined' && KING_FRIENDS_BUILD_FULL_ACCESS) {
+            return safeGet('onboardingComplete') === 'true';
+        }
         return isSubscriptionActive(s) || isTrialActive(s);
     }
 

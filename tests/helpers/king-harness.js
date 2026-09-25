@@ -72,6 +72,10 @@ function createKingContext() {
         const code = fs.readFileSync(path.join(ROOT, file), 'utf8');
         vm.runInContext(code, sandbox, { filename: file });
     }
+    vm.runInContext(
+        'KING_FRIENDS_BUILD_FULL_ACCESS = false; KING_SUBSCRIPTION_UI_ENABLED = true;',
+        sandbox
+    );
     return sandbox;
 }
 
