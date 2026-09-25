@@ -21,7 +21,7 @@
 - Capacitor **Android** wrapper around the King PWA (repo-root HTML/CSS/JS → `www/` + `android/app/src/main/assets/public/` via `npm run web:copy`).
 - **Play billing** path present (`billing-store-play.js`, native `KingBilling`); reminders and backup are **premium-gated** on native.
 - **Settings** (gear): top-anchored sheet — **How King Works** and collapsible **Premium**, daily reminder (`#remindStatus` for native permission/premium copy), export/import, privacy, reset; header with logo + “King” + plain settings icon. Home no longer shows separate Learn/Premium cards.
-- **Progress tab:** Monthly Mirror, **Best Performances** (top-3 streaks & journeys with explicit tie-breakers), collapsible Progress Graph, lifetime stats — heavy sections default collapsed.
+- **Progress tab:** Monthly Mirror, **Personal Bests** (top-3 streaks & journeys with explicit tie-breakers), collapsible Progress Graph, lifetime stats — heavy sections default collapsed.
 - **Privacy:** `public/privacy.html` copied into native bundles by `scripts/copy-web.js`.
 - **Notifications:** Android reminder channel (private); see `reminder.js` and native notifier under `android/`.
 
@@ -47,9 +47,9 @@ Output: `King-<version>-code-review-<date>.zip` in the repo root and a copy on y
 
 1. **Store policy & privacy** — Data stays on device; backup is user-initiated JSON; privacy page matches in-app links.
 2. **Permissions** — `AndroidManifest.xml`: only what reminder, backup share, and billing need.
-3. **Billing** — Subscription/trial copy in UI matches Play product setup; restore/purchase error paths; premium gates on reminder + backup + Best Performances panel.
+3. **Billing** — Subscription/trial copy in UI matches Play product setup; restore/purchase error paths; premium gates on reminder + backup + Personal Bests panel.
 4. **Settings UX** — Sheet covers home when open; Learn/Premium live in settings; no leaked PII in UI; reset flow confirms destruction.
-5. **Regression** — Journey logging, slip flow, Progress tab (including Best Performances ranking), onboarding still coherent.
+5. **Regression** — Journey logging, slip flow, Progress tab (including Personal Bests ranking), onboarding still coherent.
 6. **Release hygiene** — `versionCode` bumped when shipping; `minifyEnabled` / ProGuard notes in `app/build.gradle`; no debug endpoints.
 
 ## Commands reviewers can run

@@ -558,7 +558,7 @@ body::before {
     to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── BEST PERFORMANCES ── */
+/* ── PERSONAL BESTS ── */
 .best-perf-list {
     display: flex;
     flex-direction: column;

@@ -623,7 +623,7 @@ function renderMonthGrid() {
 }
 
 // ════════════════════════════════════════════════════════
-//  BEST PERFORMANCES
+//  PERSONAL BESTS
 // ════════════════════════════════════════════════════════
 
 function renderBestPerformanceList(containerId, board, valueSuffix) {
