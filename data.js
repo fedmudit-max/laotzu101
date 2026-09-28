@@ -116,7 +116,7 @@ const BRAIN_PHASES = [
     },
     {
         from: 366, to: Infinity,
-        emoji: '👑', phase: 'Mastery',
+        emoji: '👑', phase: 'Self Mastery',
         desc: 'A year of freedom. Your brain has significantly rewired. The patterns you\'ve built are deep and lasting — but the daily choice still matters.',
     },
 ];

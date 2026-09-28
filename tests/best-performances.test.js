@@ -99,18 +99,19 @@ test('three streaks fill podium and proportional bar widths', () => {
     assert.equal(board.slots[2].barPercent, Math.round((10 / 21) * 100));
 });
 
-test('current streak outside top 3 gets no glow', () => {
+test('current streak outside top 5 gets no glow', () => {
     const ctx = withBestPerf(createKingContext());
     resetKing(ctx, { today: '2026-06-10' });
     ctx.replaceState(ctx.mergeSavedState({
         ...ctx.getDefaultState(),
         attempt: 2,
-        pastJourneyStreaks: [{ attempt: 1, streaks: [30, 21, 15] }],
+        pastJourneyStreaks: [{ attempt: 1, streaks: [50, 40, 30, 25, 20] }],
         currentStreak: 8,
         score: { success: 8, failures: 0 },
     }));
     const board = ctx.buildBestStreaksBoard(getState(ctx));
-    assertSlotValues(board.slots, [30, 21, 15]);
+    assert.equal(board.slots.length, 5);
+    assertSlotValues(board.slots, [50, 40, 30, 25, 20]);
     assert.ok(board.slots.every(function (s) { return !s.isActive; }));
 });
 
@@ -127,10 +128,13 @@ test('equal streak length ranks earlier journey and segment higher', () => {
         currentStreak: 0,
     }));
     const board = ctx.buildBestStreaksBoard(getState(ctx));
-    assertSlotValues(board.slots, [21, 21, 21]);
+    assert.equal(board.slots.length, 5);
+    assertSlotValues(board.slots, [21, 21, 21, 21, 21]);
     assert.equal(board.slots[0].id, 'streak:1:0');
     assert.equal(board.slots[1].id, 'streak:1:1');
     assert.equal(board.slots[2].id, 'streak:1:2');
+    assert.equal(board.slots[3].id, 'streak:2:0');
+    assert.equal(board.slots[4].id, 'streak:3:0');
 });
 
 test('equal streak across journeys ranks journey 1 before 2 before 3', () => {
@@ -252,7 +256,7 @@ test('active journey in rank 3 gets bronze active state', () => {
     assert.equal(board.slots[2].rank, 3);
 });
 
-test('active journey outside top 3 has no glow', () => {
+test('active journey at rank 4 gets active highlight on green row', () => {
     const ctx = withBestPerf(createKingContext());
     resetKing(ctx, { today: '2026-06-10' });
     ctx.replaceState(ctx.mergeSavedState({
@@ -267,6 +271,29 @@ test('active journey outside top 3 has no glow', () => {
         currentStreak: 1,
     }));
     const board = ctx.buildBestJourneysBoard(getState(ctx));
+    assert.equal(board.slots.length, 4);
+    assert.equal(board.slots[3].rank, 4);
+    assert.equal(board.slots[3].isActive, true);
+});
+
+test('active journey outside top 5 has no glow', () => {
+    const ctx = withBestPerf(createKingContext());
+    resetKing(ctx, { today: '2026-06-10' });
+    ctx.replaceState(ctx.mergeSavedState({
+        ...ctx.getDefaultState(),
+        completedJourneys: [
+            { attempt: 1, score: { success: 90, failures: 10 } },
+            { attempt: 2, score: { success: 80, failures: 10 } },
+            { attempt: 3, score: { success: 70, failures: 10 } },
+            { attempt: 4, score: { success: 60, failures: 10 } },
+            { attempt: 5, score: { success: 50, failures: 10 } },
+        ],
+        attempt: 6,
+        score: { success: 8, failures: 1 },
+        currentStreak: 1,
+    }));
+    const board = ctx.buildBestJourneysBoard(getState(ctx));
+    assert.equal(board.slots.length, 5);
     assert.ok(board.slots.every(function (s) { return !s.isActive; }));
 });
 
@@ -291,6 +318,57 @@ test('journey tie on strong days ranks fewer slips higher', () => {
     assert.equal(board.slots[1].id, 'journey:3:completed');
     assert.equal(board.slots[2].rank, 3);
     assert.equal(board.slots[2].id, 'journey:1:completed');
+});
+
+test('four streaks show rank 4 without empty rank 5', () => {
+    const ctx = withBestPerf(createKingContext());
+    resetKing(ctx, { today: '2026-06-10' });
+    ctx.replaceState(ctx.mergeSavedState({
+        ...ctx.getDefaultState(),
+        pastJourneyStreaks: [{ attempt: 1, streaks: [30, 25, 20, 15] }],
+        currentStreak: 0,
+    }));
+    const board = ctx.buildBestStreaksBoard(getState(ctx));
+    assert.equal(board.slots.length, 4);
+    assertSlotValues(board.slots, [30, 25, 20, 15]);
+    assert.equal(board.slots[3].rank, 4);
+    assert.equal(board.slots[3].medal, '🏅');
+});
+
+test('five streaks extend to rank 5 with green-tier medals', () => {
+    const ctx = withBestPerf(createKingContext());
+    resetKing(ctx, { today: '2026-06-10' });
+    ctx.replaceState(ctx.mergeSavedState({
+        ...ctx.getDefaultState(),
+        pastJourneyStreaks: [{ attempt: 1, streaks: [40, 35, 30, 25, 20] }],
+        currentStreak: 0,
+    }));
+    const board = ctx.buildBestStreaksBoard(getState(ctx));
+    assert.equal(board.slots.length, 5);
+    assertSlotValues(board.slots, [40, 35, 30, 25, 20]);
+    assert.equal(board.slots[3].medal, '🏅');
+    assert.equal(board.slots[4].medal, '🎖️');
+    assert.equal(board.slots[0].barPercent, 100);
+    assert.equal(board.slots[4].barPercent, Math.round((20 / 40) * 100));
+});
+
+test('active streak at rank 4 keeps id-based highlight', () => {
+    const ctx = withBestPerf(createKingContext());
+    resetKing(ctx, { today: '2026-06-10' });
+    ctx.replaceState(ctx.mergeSavedState({
+        ...ctx.getDefaultState(),
+        attempt: 1,
+        pastJourneyStreaks: [{ attempt: 1, streaks: [50, 40, 30, 25] }],
+        currentJourneyStreaks: [],
+        currentStreak: 26,
+        score: { success: 26, failures: 0 },
+    }));
+    const board = ctx.buildBestStreaksBoard(getState(ctx));
+    assert.equal(board.slots.length, 5);
+    assert.equal(board.slots[3].rank, 4);
+    assert.equal(board.slots[3].id, 'streak:1:live');
+    assert.equal(board.slots[3].isActive, true);
+    assert.equal(board.slots[0].isActive, false);
 });
 
 test('buildBestPerformancesViewModel returns both boards', () => {

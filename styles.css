@@ -631,6 +631,14 @@ body::before {
     animation-delay: 0.7s;
 }
 
+.best-perf-row--rank-4 .best-perf-bar-fill::after {
+    animation-delay: 1.05s;
+}
+
+.best-perf-row--rank-5 .best-perf-bar-fill::after {
+    animation-delay: 1.4s;
+}
+
 @keyframes best-perf-bar-shine {
     0%, 78% {
         transform: translateX(-130%) skewX(-14deg);
@@ -661,6 +669,11 @@ body::before {
     background: linear-gradient(180deg, #e4b48a 0%, #c07842 100%);
 }
 
+.best-perf-row--rank-4 .best-perf-bar-fill,
+.best-perf-row--rank-5 .best-perf-bar-fill {
+    background: var(--green);
+}
+
 /* Active bar — pulsing ring like weekly timeline traveler dot (on track so fill can clip shine) */
 .best-perf-row--rank-1.best-perf-row--active .best-perf-bar-track {
     animation: best-perf-glow-gold 2.2s ease-in-out infinite;
@@ -672,6 +685,11 @@ body::before {
 
 .best-perf-row--rank-3.best-perf-row--active .best-perf-bar-track {
     animation: best-perf-glow-bronze 2.2s ease-in-out infinite;
+}
+
+.best-perf-row--rank-4.best-perf-row--active .best-perf-bar-track,
+.best-perf-row--rank-5.best-perf-row--active .best-perf-bar-track {
+    animation: best-perf-glow-green 2.2s ease-in-out infinite;
 }
 
 @keyframes best-perf-glow-gold {
@@ -687,6 +705,11 @@ body::before {
 @keyframes best-perf-glow-bronze {
     0%, 100% { box-shadow: 0 0 0 3px rgba(192, 120, 66, 0.14); }
     50%       { box-shadow: 0 0 0 6px rgba(192, 120, 66, 0.28); }
+}
+
+@keyframes best-perf-glow-green {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.14); }
+    50%       { box-shadow: 0 0 0 6px rgba(52, 199, 89, 0.28); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -708,6 +731,12 @@ body::before {
     .best-perf-row--rank-3.best-perf-row--active .best-perf-bar-track {
         animation: none;
         box-shadow: 0 0 0 3px rgba(192, 120, 66, 0.2);
+    }
+
+    .best-perf-row--rank-4.best-perf-row--active .best-perf-bar-track,
+    .best-perf-row--rank-5.best-perf-row--active .best-perf-bar-track {
+        animation: none;
+        box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.2);
     }
 }
 

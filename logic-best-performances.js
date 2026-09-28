@@ -1,11 +1,14 @@
 /**
- * logic-best-performances.js — Top-3 historical streaks & journeys (read-only).
+ * logic-best-performances.js — Top historical streaks & journeys (read-only).
  * Reuses journey/streak state; no duplicate scoring rules.
  */
 
-var BEST_PERFORMANCES_RANK_COUNT = 3;
+/** Podium always renders three rows (filled or placeholder). */
+var BEST_PERFORMANCES_PODIUM_COUNT = 3;
+/** Up to five ranked performances when 4th/5th exist (no empty rows for 4–5). */
+var BEST_PERFORMANCES_RANK_COUNT = 5;
 
-var BEST_PERFORMANCES_MEDALS = ['🥇', '🥈', '🥉'];
+var BEST_PERFORMANCES_MEDALS = ['🥇', '🥈', '🥉', '🏅', '🎖️'];
 
 function streakRecordId(attempt, segmentIndex) {
     return 'streak:' + attempt + ':' + segmentIndex;
@@ -170,23 +173,8 @@ function buildBestPerformanceSlots(records, activeId, kind) {
         if (v > maxVal) maxVal = v;
     }
 
-    var slots = [];
-    for (var rank = 1; rank <= BEST_PERFORMANCES_RANK_COUNT; rank++) {
+    function pushFilledSlot(rank, rec) {
         var medal = BEST_PERFORMANCES_MEDALS[rank - 1];
-        var rec = top[rank - 1];
-        if (!rec) {
-            slots.push({
-                rank: rank,
-                medal: medal,
-                empty: true,
-                value: 0,
-                barPercent: 0,
-                isActive: false,
-                ariaLabel: 'Rank ' + rank + ', no ' + (kind === 'journey' ? 'journey' : 'streak') + ' yet',
-                id: '',
-            });
-            continue;
-        }
         var value = kind === 'journey' ? rec.success : rec.days;
         var barPercent = maxVal > 0 ? Math.round((value / maxVal) * 100) : 0;
         if (barPercent < 4 && value > 0) barPercent = 4;
@@ -205,6 +193,31 @@ function buildBestPerformanceSlots(records, activeId, kind) {
             ariaLabel: label,
             id: rec.id,
         });
+    }
+
+    var slots = [];
+    for (var rank = 1; rank <= BEST_PERFORMANCES_PODIUM_COUNT; rank++) {
+        var medal = BEST_PERFORMANCES_MEDALS[rank - 1];
+        var rec = top[rank - 1];
+        if (!rec) {
+            slots.push({
+                rank: rank,
+                medal: medal,
+                empty: true,
+                value: 0,
+                barPercent: 0,
+                isActive: false,
+                ariaLabel: 'Rank ' + rank + ', no ' + (kind === 'journey' ? 'journey' : 'streak') + ' yet',
+                id: '',
+            });
+            continue;
+        }
+        pushFilledSlot(rank, rec);
+    }
+    for (var extRank = BEST_PERFORMANCES_PODIUM_COUNT + 1; extRank <= BEST_PERFORMANCES_RANK_COUNT; extRank++) {
+        var extRec = top[extRank - 1];
+        if (!extRec) break;
+        pushFilledSlot(extRank, extRec);
     }
     return { slots: slots };
 }
