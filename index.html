@@ -318,10 +318,20 @@
 <!-- ── Settings (export, reminder, reset, privacy) ── -->
 <div class="overlay settings-overlay" id="appSettingsOverlay" aria-hidden="true" role="presentation">
     <div class="settings-sheet" role="dialog" aria-modal="true" aria-label="Settings" onclick="event.stopPropagation()">
-        <div class="settings-sheet-top">
-            <button type="button" class="settings-sheet-dismiss" data-action="close-settings" aria-label="Close settings">✕</button>
-        </div>
+        <div class="settings-sheet-handle" aria-hidden="true"></div>
         <div class="settings-sheet-scroll">
+            <div class="settings-block" id="settingsLearnSection">
+                <div class="settings-group">
+                    <button type="button" class="settings-row" data-action="open-learn-journey">
+                        <img class="settings-row-icon settings-row-app-logo" src="./assets/icon-192.png" width="30" height="30" alt="" aria-hidden="true">
+                        <span class="settings-row-text">
+                            <span class="settings-row-title">How King Works</span>
+                        </span>
+                        <span class="settings-row-chevron" aria-hidden="true">›</span>
+                    </button>
+                </div>
+            </div>
+
             <div class="settings-block settings-reminder-wrap" id="settingsReminderSection">
                 <div class="settings-group settings-group-reminder">
                     <div class="settings-remind-head">
@@ -341,18 +351,6 @@
                 </div>
             </div>
 
-            <div class="settings-block" id="settingsLearnSection">
-                <div class="settings-group">
-                    <button type="button" class="settings-row" data-action="open-learn-journey">
-                        <img class="settings-row-icon settings-row-app-logo" src="./assets/icon-192.png" width="30" height="30" alt="" aria-hidden="true">
-                        <span class="settings-row-text">
-                            <span class="settings-row-title">How King Works</span>
-                        </span>
-                        <span class="settings-row-chevron" aria-hidden="true">›</span>
-                    </button>
-                </div>
-            </div>
-
             <div class="settings-block premium-panel-card" id="premiumPanelCard">
                 <div class="settings-group settings-group-premium settings-group-premium-collapse">
                     <button type="button" class="collapse-header settings-premium-collapse-header" id="premiumPanelToggle" aria-expanded="false" aria-controls="premiumPanelBody">
@@ -368,6 +366,19 @@
                         <p class="premium-panel-status" id="premiumPanelStatus"></p>
                         <button class="btn-premium-panel settings-premium-cta" type="button" id="premiumPanelSubscribeBtn" data-action="open-premium">View plans &amp; subscribe</button>
                     </div>
+                </div>
+            </div>
+
+            <div class="settings-block" id="settingsLegalSection">
+                <div class="settings-group">
+                    <button type="button" class="settings-row" data-action="open-privacy">
+                        <span class="settings-row-icon settings-row-icon-muted" aria-hidden="true">◆</span>
+                        <span class="settings-row-text">
+                            <span class="settings-row-title">Privacy policy</span>
+                            <span class="settings-row-sub">King does not store your data; it stays on your phone.</span>
+                        </span>
+                        <span class="settings-row-chevron" aria-hidden="true">›</span>
+                    </button>
                 </div>
             </div>
 
@@ -390,18 +401,6 @@
                         <span class="settings-row-chevron" aria-hidden="true">›</span>
                     </button>
                     <p class="settings-group-note settings-group-note--footer backup-status" id="lastBackupLabel">Last exported: Never</p>
-                </div>
-            </div>
-
-            <div class="settings-block" id="settingsLegalSection">
-                <div class="settings-group">
-                    <button type="button" class="settings-row" data-action="open-privacy">
-                        <span class="settings-row-icon settings-row-icon-muted" aria-hidden="true">◆</span>
-                        <span class="settings-row-text">
-                            <span class="settings-row-title">Privacy policy</span>
-                        </span>
-                        <span class="settings-row-chevron" aria-hidden="true">›</span>
-                    </button>
                 </div>
             </div>
 
