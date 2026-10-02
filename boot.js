@@ -11,6 +11,20 @@ function isCapacitorNative() {
     }
 }
 
+function applyKingPlatformClass() {
+    var body = document.body;
+    if (!body) return;
+    try {
+        var Cap = window.Capacitor;
+        if (!Cap || typeof Cap.getPlatform !== 'function') return;
+        var platform = Cap.getPlatform();
+        if (platform === 'android') body.classList.add('platform-android');
+        else if (platform === 'ios') body.classList.add('platform-ios');
+    } catch (e) {
+        logOptionalFailure('boot:platform-class', e);
+    }
+}
+
 function registerServiceWorkerDeferred() {
     // Native Capacitor apps ship files in the bundle — do not use a service worker
     // (Capacitor WebView is https://localhost, which is not GitHub Pages).
@@ -60,6 +74,12 @@ function registerServiceWorkerDeferred() {
 }
 
 registerServiceWorkerDeferred();
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyKingPlatformClass);
+} else {
+    applyKingPlatformClass();
+}
 
 var KING_QUOTE_MS = 100;
 var KING_APP_BG = '#f2f2f7';
