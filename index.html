@@ -88,6 +88,23 @@
             <div class="score-breakdown" id="currentJourneyBreakdown"></div>
         </div>
 
+        <div class="card home-journey-metaphor-card" id="journeyMetaphorHint" hidden>
+            <h2 class="home-journey-metaphor-title">A Journey is like a Match</h2>
+            <div class="home-journey-metaphor-body">
+                <p class="home-journey-metaphor-lead"><strong>Football:</strong> Stay strong today → you score <strong>1 goal</strong>.<br>Slip today → opponent scores <strong>1 goal</strong>.<br><em>Match ends when <strong>10 goals</strong> are scored against you.</em><br>E.g. <span class="score-strong">15</span>–10 → 15 strong days & 10 slip days.<br>Next match: beat 15 → e.g. <span class="score-strong">20</span>–10.<br>Next match: beat 20 → e.g. <span class="score-strong">25</span>–10.</p>
+                <p class="home-journey-metaphor-lead"><strong>Cricket:</strong> Stay strong today → <strong>+1 run</strong>.<br>Slip today → <strong>1 wicket</strong> down.<br><em>Match ends when you lose <strong>10 wickets</strong>.</em><br>E.g. <span class="score-strong">15</span>/10 → 15 strong days & 10 slip days.<br>Next match: beat 15 → e.g. <span class="score-strong">20</span>/10.<br>Next match: beat 20 → e.g. <span class="score-strong">25</span>/10.</p>
+            </div>
+            <button type="button" class="home-journey-metaphor-btn" data-action="dismiss-journey-metaphor-hint">Got it</button>
+        </div>
+
+        <div class="card home-journey-metaphor-card" id="journeyBestJourneyHint" hidden>
+            <div class="home-journey-metaphor-body">
+                <p class="home-journey-metaphor-lead">First journey: Current Journey is your Best Journey.</p>
+                <p class="home-journey-metaphor-lead">Second journey: Beat your first journey score.</p>
+            </div>
+            <button type="button" class="home-journey-metaphor-btn" data-action="dismiss-journey-best-hint">Got it</button>
+        </div>
+
         <!-- 10 slips (🛡️ shields) -->
         <div class="chances-card">
             <div class="chances-grid" id="chancesGrid"></div>
@@ -646,15 +663,15 @@
 
         <div class="onboarding-slide" id="slide-1">
             <div class="onboarding-body onboarding-journey-scroll">
-                <div class="onb-journey-formula-box">A Journey is your total Strong Days against 10 Slips.</div>
+                <div class="onb-journey-formula-box">A Journey is your total Strong Days against 10 Slip days.</div>
                 <div class="onb-journey-example-divider">— Example —</div>
 
                 <table class="onb-journey-example-table" aria-label="Example journeys">
                     <thead>
                         <tr>
                             <th scope="col">Journey</th>
-                            <th scope="col">Strong days</th>
-                            <th scope="col">Slips</th>
+                            <th scope="col">Strong Days</th>
+                            <th scope="col">Slip Days</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -747,6 +764,17 @@
 <!-- ── Confirmation modal ── -->
 <div class="modal" id="confirmModal">
     <div class="modal-card">
+        <div id="modalEarlyLogBlock" class="modal-early-block" hidden>
+            <div class="modal-early-row">
+                <p id="modalEarlyLogHint" class="modal-early-log-hint"></p>
+                <button type="button" class="modal-early-settings-btn" id="modalSettingsBtn" data-action="modalOpenSettings" aria-label="Reminder settings">
+                    <svg class="modal-early-settings-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke="currentColor" stroke-width="2"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
         <h3 id="modalMessage">Are you sure?</h3>
         <!-- Reset confirmation input — only shown for reset action -->
         <div id="resetConfirmWrap" style="display:none;margin-bottom:16px;">
@@ -755,8 +783,8 @@
                
                 style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:16px;font-family:inherit;outline:none;letter-spacing:1px;text-transform:uppercase;"/>
         </div>
-        <div class="modal-buttons">
-            <button class="modal-btn cancel"  data-action="modalCancel">Cancel</button>
+        <div class="modal-buttons" id="modalActionButtons">
+            <button class="modal-btn cancel" data-action="modalCancel">Cancel</button>
             <button class="modal-btn confirm" id="modalConfirmBtn" data-action="modalConfirm">Confirm</button>
         </div>
     </div>

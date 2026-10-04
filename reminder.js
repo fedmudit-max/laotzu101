@@ -42,6 +42,10 @@ function saveReminderSettings(settings) {
     }));
 }
 
+function isDailyReminderEnabled() {
+    return !!loadReminderSettings().enabled;
+}
+
 function formatReminderTime(hour, minute) {
     var parts = splitReminderClock(hour, minute);
     var mm = minute < 10 ? '0' + minute : String(minute);

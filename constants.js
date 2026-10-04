@@ -12,8 +12,15 @@ var KING_FRIENDS_BUILD_FULL_ACCESS = true;
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const MAX_FAILURES = 10;
+/** Before this local hour, strong-log confirm modal shows early-log hint (20 = 8pm). */
+const EARLY_STRONG_LOG_CUTOFF_HOUR = 20;
+const EARLY_STRONG_LOG_CONFIRM_HINT_TAIL =
+    'For accuracy, log around 9pm or bedtime. You can turn on the reminder in settings.';
 const STORAGE_KEY = 'habitTracker_v3';
 const LAST_BACKUP_KEY = 'kingLastBackupAt';
+/** One-time home card: journey football / cricket metaphor (localStorage). */
+const KING_JOURNEY_METAPHOR_HINT_KEY = 'kingJourneyMetaphorHintDismissed';
+const KING_JOURNEY_BEST_HINT_KEY = 'kingJourneyBestHintDismissed';
 const URGE_DURATION_SECS = 30;
 const BREATH_IN_SECS = 4;
 const BREATH_OUT_SECS = 4;

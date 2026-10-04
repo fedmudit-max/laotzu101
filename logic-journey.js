@@ -669,6 +669,8 @@ function expandSectionMilestones(sectionDays, options) {
 
 function beginJourneyAfterOnboarding() {
     safeSet('onboardingComplete', 'true');
+    safeRemove(KING_JOURNEY_METAPHOR_HINT_KEY);
+    safeRemove(KING_JOURNEY_BEST_HINT_KEY);
 
     if (!state.calendarDay || state.calendarDay < 1) {
         state.calendarDay = 1;

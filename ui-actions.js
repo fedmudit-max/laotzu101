@@ -71,6 +71,24 @@ function showModal(action) {
         action === 'reset'   ? 'Reset all data?' :
         action === 'import'  ? formatImportConfirmMessage() :
         'Today was hard. Log it and keep going?';
+
+    const earlyBlockEl = document.getElementById('modalEarlyLogBlock');
+    const earlyHintEl = document.getElementById('modalEarlyLogHint');
+    if (earlyBlockEl && earlyHintEl) {
+        if (action === 'success' && typeof getEarlyStrongLogConfirmHint === 'function') {
+            const hint = getEarlyStrongLogConfirmHint();
+            if (hint) {
+                earlyHintEl.textContent = hint;
+                earlyBlockEl.hidden = false;
+            } else {
+                earlyHintEl.textContent = '';
+                earlyBlockEl.hidden = true;
+            }
+        } else {
+            earlyHintEl.textContent = '';
+            earlyBlockEl.hidden = true;
+        }
+    }
     document.getElementById('modalConfirmBtn').textContent =
         action === 'success' ? 'Confirm' :
         action === 'reset'   ? 'Yes, reset all' :
@@ -106,8 +124,23 @@ function closeModal() {
     document.getElementById('confirmModal').classList.remove('active');
     document.getElementById('resetConfirmInput').value = '';
     document.getElementById('resetConfirmWrap').style.display = 'none';
+    const earlyBlockEl = document.getElementById('modalEarlyLogBlock');
+    if (earlyBlockEl) earlyBlockEl.hidden = true;
     pendingAction = null;
     pendingImportBackup = null;
+}
+
+function openSettingsFromConfirmModal() {
+    closeModal();
+    if (typeof openAppSettings === 'function') {
+        openAppSettings();
+        const reminder = document.getElementById('settingsReminderSection');
+        if (reminder) {
+            requestAnimationFrame(function () {
+                reminder.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            });
+        }
+    }
 }
 
 function confirmAction() {
@@ -131,6 +164,8 @@ function confirmAction() {
 function resetAll() {
     safeRemove(STORAGE_KEY);
     safeRemove('onboardingComplete');
+    safeRemove(KING_JOURNEY_METAPHOR_HINT_KEY);
+    safeRemove(KING_JOURNEY_BEST_HINT_KEY);
     clearLastBackupAt();
     replaceState(getDefaultState());
     chartPage = -1;
@@ -140,7 +175,9 @@ function resetAll() {
     switchTab(0);
     switchChartMode('streaks');
     saveToStorage(state);
+    resetJourneyMetaphorHintScrollPins();
     renderAll();
+    if (typeof scheduleScrollAppHomeToTop === 'function') scheduleScrollAppHomeToTop();
     checkOnboarding();
 }
 

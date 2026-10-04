@@ -32,6 +32,11 @@ let deferredHeavyRendered = false;
 // ════════════════════════════════════════════════════════
 
 function init() {
+    try {
+        if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    } catch (e) {
+        logOptionalFailure('ui:scroll-restoration', e);
+    }
     const saved = loadFromStorage();
     if (!saved) {
         replaceState(getDefaultState());
@@ -96,6 +101,7 @@ function renderAll(options) {
     const full = true;
     const jobs = [
         renderTopStats,
+        renderJourneyMetaphorHint,
         renderChances,
         renderButtons,
         renderPremiumStatus,
@@ -156,6 +162,100 @@ function renderDeferredHeavy() {
 
 function ensureDeferredHeavyRendered() {
     if (!deferredHeavyRendered) renderDeferredHeavy();
+}
+
+function isFreshFirstJourneyForMetaphorHint() {
+    if (safeGet('onboardingComplete') !== 'true') return false;
+    if (typeof isAwaitingNextJourney === 'function' && isAwaitingNextJourney()) return false;
+    if ((state.attempt || 1) !== 1) return false;
+    const counts = getScoreCounts();
+    if (counts.success !== 0 || counts.failures !== 0) return false;
+    return state.todayStatus === 'none' || !state.todayStatus;
+}
+
+function journeyMetaphorHintDismissed(key) {
+    try {
+        return safeGet(key) === '1';
+    } catch (e) {
+        logOptionalFailure('ui:journey-metaphor-hint', e);
+        return false;
+    }
+}
+
+var journeyHintScrollMatchPinned = false;
+var journeyHintScrollBestPinned = false;
+
+function scrollAppHomeToTop() {
+    if (typeof currentTab !== 'undefined' && currentTab !== 0) return;
+    try {
+        window.scrollTo(0, 0);
+        if (document.documentElement) document.documentElement.scrollTop = 0;
+        if (document.body) document.body.scrollTop = 0;
+    } catch (e) {
+        logOptionalFailure('ui:scroll-home-top', e);
+    }
+}
+
+function scheduleScrollAppHomeToTop() {
+    requestAnimationFrame(function () {
+        requestAnimationFrame(scrollAppHomeToTop);
+    });
+}
+
+function resetJourneyMetaphorHintScrollPins() {
+    journeyHintScrollMatchPinned = false;
+    journeyHintScrollBestPinned = false;
+}
+
+function renderJourneyMetaphorHint() {
+    const matchCard = document.getElementById('journeyMetaphorHint');
+    const bestCard = document.getElementById('journeyBestJourneyHint');
+    if (!matchCard && !bestCard) return;
+
+    const fresh = isFreshFirstJourneyForMetaphorHint();
+    const matchDismissed = journeyMetaphorHintDismissed(KING_JOURNEY_METAPHOR_HINT_KEY);
+    const bestDismissed = journeyMetaphorHintDismissed(KING_JOURNEY_BEST_HINT_KEY);
+
+    if (!fresh) {
+        resetJourneyMetaphorHintScrollPins();
+    }
+
+    const matchVisible = fresh && !matchDismissed;
+    const bestVisible = fresh && matchDismissed && !bestDismissed;
+
+    if (matchCard) {
+        matchCard.hidden = !matchVisible;
+    }
+    if (bestCard) {
+        bestCard.hidden = !bestVisible;
+    }
+
+    if (matchVisible && !journeyHintScrollMatchPinned) {
+        journeyHintScrollMatchPinned = true;
+        scheduleScrollAppHomeToTop();
+    }
+    if (bestVisible && !journeyHintScrollBestPinned) {
+        journeyHintScrollBestPinned = true;
+        scheduleScrollAppHomeToTop();
+    }
+}
+
+function dismissJourneyMetaphorHint() {
+    try {
+        safeSet(KING_JOURNEY_METAPHOR_HINT_KEY, '1');
+    } catch (e) {
+        logOptionalFailure('ui:journey-metaphor-hint-dismiss', e);
+    }
+    renderJourneyMetaphorHint();
+}
+
+function dismissJourneyBestHint() {
+    try {
+        safeSet(KING_JOURNEY_BEST_HINT_KEY, '1');
+    } catch (e) {
+        logOptionalFailure('ui:journey-best-hint-dismiss', e);
+    }
+    renderJourneyMetaphorHint();
 }
 
 function getScoreCounts() {

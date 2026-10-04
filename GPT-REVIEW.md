@@ -19,7 +19,7 @@ See `android/RELEASE_SIGNING.md` for the maintainer checklist.
 
 Maintainers: `npm run review:zip` — runs `web:copy` then zips the tree with excludes for `android/**/build/`, `.gradle`, keystores, and `node_modules`. Do not hand-zip the repo after a local Gradle build without those excludes.
 
-## Version and tests (1.0.1)
+## Version and tests (1.0.2)
 
-- **`package.json` `version`** matches Android **`versionName` `1.0.1`** (`versionCode` **4** in `android/app/build.gradle`).
-- **`npm test`**: **95** passing tests (`tests/*.test.js`). Update docs if the count changes.
+- **`package.json` `version`** matches Android **`versionName` `1.0.2`** (`versionCode` **7** in `android/app/build.gradle`; bump before each Play upload).
+- **`npm test`**: **103** passing tests (`tests/*.test.js`). See also `PLAY_INTERNAL_TEST_SNAPSHOT.md`.

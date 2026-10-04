@@ -178,6 +178,7 @@ function showFileProtocolBanner() {
             closeCelebration: closeCelebration,
             modalCancel: closeModal,
             modalConfirm: confirmAction,
+            modalOpenSettings: openSettingsFromConfirmModal,
             closeUrge: closeUrge,
             closeCompare: closeCompare,
             'open-learn-journey': openLearnJourney,
@@ -191,6 +192,8 @@ function showFileProtocolBanner() {
             'close-privacy': closePrivacy,
             'open-settings': openAppSettings,
             'close-settings': closeAppSettings,
+            'dismiss-journey-metaphor-hint': dismissJourneyMetaphorHint,
+            'dismiss-journey-best-hint': dismissJourneyBestHint,
         };
         if (actions[action]) actions[action]();
     }

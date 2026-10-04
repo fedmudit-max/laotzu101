@@ -403,4 +403,8 @@ function completeOnboarding() {
     } catch (err) {
         console.error('King first-launch render failed:', err);
     }
+
+    if (typeof scheduleScrollAppHomeToTop === 'function') {
+        scheduleScrollAppHomeToTop();
+    }
 }

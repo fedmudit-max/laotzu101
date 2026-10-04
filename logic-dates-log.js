@@ -43,6 +43,33 @@ function todayKey() {
     return dateKeyFromDate(new Date());
 }
 
+/** True when local time is before EARLY_STRONG_LOG_CUTOFF_HOUR (default 8pm). */
+function isBeforeEarlyStrongLogCutoff(now) {
+    const d = now instanceof Date ? now : new Date();
+    return d.getHours() < EARLY_STRONG_LOG_CUTOFF_HOUR;
+}
+
+/** 12-hour local clock for early-log hint (e.g. 7:30 PM). */
+function formatLocalClockLabel(now) {
+    const d = now instanceof Date ? now : new Date();
+    const hour = d.getHours();
+    const minute = d.getMinutes();
+    let h12 = hour % 12;
+    if (h12 === 0) h12 = 12;
+    const mm = minute < 10 ? '0' + minute : String(minute);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    return h12 + ':' + mm + ' ' + ampm;
+}
+
+/** Confirm-modal hint for logging strong today before bedtime; null at/after cutoff or if reminder is on. */
+function getEarlyStrongLogConfirmHint(now) {
+    const d = now instanceof Date ? now : new Date();
+    if (!isBeforeEarlyStrongLogCutoff(d)) return null;
+    if (typeof isDailyReminderEnabled === 'function' && isDailyReminderEnabled()) return null;
+    const time = formatLocalClockLabel(d);
+    return 'It\u2019s ' + time + ', early to log now. ' + EARLY_STRONG_LOG_CONFIRM_HINT_TAIL;
+}
+
 // ════════════════════════════════════════════════════════
 //  DAILY LOG — source of truth for day-by-day events
 // ════════════════════════════════════════════════════════
