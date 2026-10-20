@@ -530,6 +530,12 @@ body::before {
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
 }
 
+/* Closed test: frosted veil only — no Premium / subscribe copy */
+.premium-lock-veil--silent {
+    cursor: default;
+    pointer-events: none;
+}
+
 
 @keyframes fadeUp {
     from { opacity: 0; transform: translateY(20px); }
@@ -860,7 +866,7 @@ body::before {
     padding-top: 14px;
 }
 
-/* ── How King Works entry + sheet ── */
+/* ── How King Builds Will Power entry + sheet ── */
 .learn-journey-card .collapse-header {
     cursor: pointer;
 }
@@ -1357,6 +1363,11 @@ body::before {
     border: 1.5px solid rgba(255,159,10,0.3);
     position: relative;
     overflow: hidden;
+}
+
+#bestJourneyBox.premium-gated.is-locked > *:not(.premium-lock-veil) {
+    filter: blur(3px);
+    opacity: 0.55;
 }
 
 /* Ghost trophy behind Best Journey card */

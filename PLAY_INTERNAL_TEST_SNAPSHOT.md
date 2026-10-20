@@ -10,18 +10,19 @@
 | Branch | `main` |
 | Release commit (1.0.2 baseline) | `75a62cf` — *Release 1.0.2: settings bottom sheet, reorder, privacy, and spacing.* |
 | Working tree | Uncommitted session work — run `git status` before upload. |
-| Service worker | `king-v423` (`sw.js` `CACHE_NAME`) |
-| Snapshot updated | 2026-10-04 (internal test cut #2) |
+| Service worker | `king-v448` (`sw.js` `CACHE_NAME`) |
+| Snapshot updated | 2026-10-20 (closed testing cut) |
 | npm `package.json` `version` | `1.0.2` (aligned with Android) |
 | Android `versionName` | `1.0.2` |
-| Android `versionCode` | `7` |
+| Android `versionCode` | `8` |
 | Application ID | `com.kingtracker.app` (verify in `android/app/build.gradle`) |
 
 ## What this build is
 
 - Capacitor **Android** wrapper around the King PWA (repo-root HTML/CSS/JS → `www/` + `android/app/src/main/assets/public/` via `npm run web:copy`).
-- **Play billing** code present (`billing-store-play.js`, native `KingBilling`); **friends build** flags in `constants.js`: `KING_FRIENDS_BUILD_FULL_ACCESS` + subscription UI off (full access for testers until flags flipped for billing test).
-- **Settings** (gear): bottom sheet — **How King Works**, collapsible **Premium**, daily reminder (`#remindStatus` for native permission/premium copy), export/import, privacy, reset.
+- **Play billing** code present (`billing-store-play.js`, native `KingBilling`); **closed test** flags: `KING_SUBSCRIPTION_UI_ENABLED = false`, `KING_FRIENDS_BUILD_FULL_ACCESS = false` (15-day install trial from `appStartDate`, locks after; no subscribe/paywall UI). Flip `SUBSCRIPTION_UI` true for internal billing test.
+- **Premium trial:** 15 wall days from **`appStartDate`** (not per-journey Day counter). **Best Journey** + **Personal Bests:** open journeys 1–2 after trial; lock from journey 3+ (paid sub unlocks). Personal Bests collapses when journey-grace lock applies.
+- **Settings** (gear): bottom sheet — **How King Builds Will Power**, collapsible **Premium**, daily reminder (`#remindStatus` for native permission/premium copy), export/import, privacy, reset.
 - **Home:** one-time journey metaphor / best-journey hint cards (Journey 1); **strong-day confirm** before 8pm local: early-log card above title (local time + bedtime copy + settings gear → Reminder), hidden if daily reminder is on.
 - **Progress tab:** Monthly Mirror, **Personal Bests**, collapsible Progress Graph, lifetime stats.
 - **Privacy:** `public/privacy.html` → `privacy.html` + `privacy-content.js` via `scripts/copy-web.js`. Short version: *King does not store your data; it stays on your phone.*

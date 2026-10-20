@@ -183,8 +183,8 @@ function replaceState(next) {
 // ════════════════════════════════════════════════════════
 
 /**
- * Ensure a valid trialStartedAt exists so trial lasts PREMIUM_TRIAL_DAYS from
- * journey calendar Day 1 (set on onboarding / when onboarded user loads).
+ * Ensure a valid trialStartedAt exists (paired with appStartDate for PREMIUM_TRIAL_DAYS
+ * wall-day trial from install).
  * @returns {boolean} true if trialStartedAt was written/repaired
  */
 function ensureTrialStarted(s, opts) {

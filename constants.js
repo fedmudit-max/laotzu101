@@ -3,12 +3,12 @@
  */
 
 /**
- * Friend / early closed-test builds: hide subscribe UI and prices; unlock all features after onboarding.
- * Before Play billing test: set SUBSCRIPTION_UI true and FRIENDS_FULL_ACCESS false.
+ * Closed testing: trial + locks after trial, but no subscribe UI (testers don’t see paid messaging).
+ * Internal billing test: SUBSCRIPTION_UI true, FRIENDS_FULL_ACCESS false.
  */
-/** Flipped per release track (friends test vs billing test); not const so harness can override in tests. */
+/** Flipped per release track; not const so harness can override in tests. */
 var KING_SUBSCRIPTION_UI_ENABLED = false;
-var KING_FRIENDS_BUILD_FULL_ACCESS = true;
+var KING_FRIENDS_BUILD_FULL_ACCESS = false;
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const MAX_FAILURES = 10;
@@ -30,8 +30,8 @@ const BREATH_RING_CIRCUMFERENCE = 339;
 const BREATH_SOUND_GAIN = 0.75;
 const BACKUP_FORMAT = 'king-backup';
 const BACKUP_VERSION = 1;
-/** Local free trial length. Access window is trialStartedAt + this many days. */
-const PREMIUM_TRIAL_DAYS = 30;
+/** Premium trial length in wall days since appStartDate (install Day 1 … Day N inclusive). */
+const PREMIUM_TRIAL_DAYS = 15;
 /**
  * Play Console subscriptions for com.kingtracker.app.
  *
@@ -69,13 +69,20 @@ const PREMIUM_PLAY_PRODUCT_IDS = PREMIUM_PLAY_PRODUCTS.map(function (p) { return
  */
 const PREMIUM_PLAY_CACHE_DAYS = 3;
 const PREMIUM_ANNUAL_VALUE_MESSAGE = 'Best value for the long journey';
-/** Display-only annual strikethrough / “was” price for % off vs annual sale. */
+/**
+ * When false, paywall shows plan names only — no amounts, strikethrough, or % off.
+ * Google Play still shows the price on the purchase sheet. Set true for billing tests.
+ */
+var KING_SHOW_PLAN_PRICES = false;
+/** Display-only annual strikethrough / “was” price for % off vs annual sale (when KING_SHOW_PLAN_PRICES). */
 const PREMIUM_ANNUAL_COMPARE_AMOUNT = 2299;
-/** Dev mock until Play/App Store supplies localized plan prices. Web / harness only — not shown on Android billing builds. */
+/** Dev mock plan rows (no amounts). Web / harness only — not shown on Android billing builds. */
 const PREMIUM_PLANS_MOCK = [
-    { id: 'monthly', listAmount: 199, amount: 149, period: 'month' },
-    { id: 'annual', amount: 1499, period: 'year', message: PREMIUM_ANNUAL_VALUE_MESSAGE },
+    { id: 'monthly', period: 'month' },
+    { id: 'annual', period: 'year', message: PREMIUM_ANNUAL_VALUE_MESSAGE },
 ];
+/** Shown on paywall when plan prices are hidden in-app. */
+const PREMIUM_PLAN_PRICE_AT_CHECKOUT = 'Google Play shows your price at checkout.';
 /** Paywall copy when Play pricing cannot be loaded on Android. */
 const PREMIUM_PRICE_UNAVAILABLE = 'Price unavailable';
 const PREMIUM_PRICE_LOADING = 'Loading price…';

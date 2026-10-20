@@ -21,5 +21,5 @@ Maintainers: `npm run review:zip` — runs `web:copy` then zips the tree with ex
 
 ## Version and tests (1.0.2)
 
-- **`package.json` `version`** matches Android **`versionName` `1.0.2`** (`versionCode` **7** in `android/app/build.gradle`; bump before each Play upload).
+- **`package.json` `version`** matches Android **`versionName` `1.0.2`** (`versionCode` **8** in `android/app/build.gradle`; bump before each Play upload).
 - **`npm test`**: **103** passing tests (`tests/*.test.js`). See also `PLAY_INTERNAL_TEST_SNAPSHOT.md`.

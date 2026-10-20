@@ -407,4 +407,5 @@ function completeOnboarding() {
     if (typeof scheduleScrollAppHomeToTop === 'function') {
         scheduleScrollAppHomeToTop();
     }
+
 }

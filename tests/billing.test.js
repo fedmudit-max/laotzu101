@@ -28,7 +28,8 @@ test('getPremiumOffer uses mock plans on web harness', () => {
     const offer = ctx.getPremiumOffer();
     assert.equal(offer.source, 'mock');
     assert.ok(offer.plans.length >= 2);
-    assert.match(offer.plans[0].price, /₹/);
+    assert.equal(offer.plans[0].price, undefined);
+    assert.equal(offer.plans[0].id, 'monthly');
 });
 
 test('getPremiumOffer never shows mock on native without Play prices', () => {
@@ -53,8 +54,8 @@ test('getPremiumOffer shows Play prices after setPremiumOfferFromStore', () => {
     });
     const offer = ctx.getPremiumOffer();
     assert.equal(offer.source, 'play');
-    assert.equal(offer.plans[0].price, '$4.99');
-    assert.equal(offer.plans.some((p) => String(p.price).indexOf('₹149') !== -1), false);
+    assert.equal(offer.plans[0].price, undefined);
+    assert.equal(offer.plans[1].price, undefined);
 });
 
 test('getPremiumOffer unavailable when Play pricing load fails on native', () => {
@@ -124,8 +125,14 @@ test('restore source updates entitlement like play', () => {
 
 test('expired cache after restore denies premium when trial ended', () => {
     const ctx = createKingContext();
-    resetKing(ctx);
-    setState(ctx, { trialStartedAt: isoDaysFromNow(-40) });
+    resetKing(ctx, { today: '2026-06-30' });
+    setState(ctx, {
+        trialStartedAt: isoDaysFromNow(-40),
+        appStartDate: '2026-05-25',
+        journeyStartDate: '2026-06-15',
+        lastOpenedDate: '2026-06-30',
+        calendarDay: 16,
+    });
     ctx.updateEntitlementSnapshot({
         source: 'restore',
         premiumUntil: isoDaysFromNow(-1),
@@ -138,21 +145,37 @@ test('expired cache after restore denies premium when trial ended', () => {
 test('premium trial panel phase is early during trial', () => {
     const ctx = createKingContext();
     resetKing(ctx);
-    setState(ctx, { trialStartedAt: isoDaysFromNow(-10) });
+    setState(ctx, {
+        trialStartedAt: isoDaysFromNow(-9),
+        appStartDate: '2026-06-06',
+        calendarDay: 10,
+        journeyStartDate: '2026-06-06',
+    });
     assert.equal(ctx.getPremiumTrialPanelPhase(), 'early');
 });
 
 test('premium trial panel phase stays early in the last trial week', () => {
     const ctx = createKingContext();
     resetKing(ctx);
-    setState(ctx, { trialStartedAt: isoDaysFromNow(-(30 - 5)) });
+    setState(ctx, {
+        trialStartedAt: isoDaysFromNow(-10),
+        appStartDate: '2026-06-05',
+        calendarDay: 11,
+        journeyStartDate: '2026-06-05',
+    });
     assert.equal(ctx.getPremiumTrialPanelPhase(), 'early');
 });
 
 test('premium trial panel phase is expired after trial ends', () => {
     const ctx = createKingContext();
     resetKing(ctx);
-    setState(ctx, { trialStartedAt: isoDaysFromNow(-40), premiumUntil: '' });
+    setState(ctx, {
+        trialStartedAt: isoDaysFromNow(-40),
+        appStartDate: '2026-05-26',
+        premiumUntil: '',
+        calendarDay: 20,
+        journeyStartDate: '2026-05-26',
+    });
     assert.equal(ctx.getPremiumTrialPanelPhase(), 'expired');
 });
 
@@ -165,4 +188,57 @@ test('premium trial panel phase is active for paid subscription', () => {
         source: 'play',
     });
     assert.equal(ctx.getPremiumTrialPanelPhase(), 'active');
+});
+
+test('journey grace premium lock stays open through journey 2 after trial', () => {
+    const ctx = createKingContext();
+    resetKing(ctx);
+    setState(ctx, {
+        trialStartedAt: isoDaysFromNow(-4),
+        appStartDate: '2026-06-11',
+        calendarDay: 5,
+        journeyStartDate: '2026-06-11',
+        attempt: 2,
+    });
+    assert.equal(ctx.Entitlement.isTrialActive(getState(ctx)), true);
+    assert.equal(ctx.shouldLockJourneyGracePremiumFeature(), false);
+});
+
+test('journey grace premium lock from journey 3 even during trial', () => {
+    const ctx = createKingContext();
+    resetKing(ctx);
+    setState(ctx, {
+        trialStartedAt: isoDaysFromNow(-2),
+        appStartDate: '2026-06-13',
+        calendarDay: 3,
+        journeyStartDate: '2026-06-13',
+        attempt: 3,
+    });
+    assert.equal(ctx.Entitlement.isTrialActive(getState(ctx)), true);
+    assert.equal(ctx.shouldLockJourneyGracePremiumFeature(), true);
+    setState(ctx, { attempt: 2 });
+    assert.equal(ctx.shouldLockJourneyGracePremiumFeature(), false);
+});
+
+test('canAccessJourneyGracePremiumFeature on journey 2 after install trial ended', () => {
+    const ctx = createKingContext();
+    resetKing(ctx, { today: '2026-07-01' });
+    setState(ctx, {
+        trialStartedAt: isoDaysFromNow(-50),
+        appStartDate: '2026-05-15',
+        attempt: 2,
+    });
+    assert.equal(ctx.Entitlement.hasPremiumAccess(getState(ctx)), false);
+    assert.equal(ctx.canAccessJourneyGracePremiumFeature(), true);
+});
+
+test('journey grace premium lock never applies when paid subscription is active', () => {
+    const ctx = createKingContext();
+    resetKing(ctx);
+    setState(ctx, {
+        attempt: 5,
+        premiumUntil: isoDaysFromNow(30),
+        source: 'play',
+    });
+    assert.equal(ctx.shouldLockJourneyGracePremiumFeature(), false);
 });

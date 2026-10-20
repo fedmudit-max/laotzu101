@@ -15,9 +15,9 @@
  * Embedded on journey `state` (not a separate store). JSDoc shape:
  *
  * @typedef {Object} EntitlementSnapshot
- * @property {string} [trialStartedAt]  ISO-8601; '' if unset. Local trial start.
- *                                      Window = trialStartedAt + PREMIUM_TRIAL_DAYS.
- *                                      Written at onboarding / Day 1 (ensureTrialStarted / startPremiumTrial).
+ * @property {string} [trialStartedAt]  ISO-8601; '' if unset. Seeded at onboarding (with appStartDate).
+ * @property {string} [appStartDate]    YYYY-MM-DD install Day 1. Trial runs PREMIUM_TRIAL_DAYS wall days
+ *                                      from here (not per-journey Day counter).
  * @property {string} [premiumUntil]    ISO-8601; '' if unset.
  *                                      Sprint 3A: local access-cache expiry after last Play
  *                                      client confirmation (PREMIUM_PLAY_CACHE_DAYS).
@@ -70,8 +70,8 @@
  *   Premium purchase only unlocks UI features via premiumUntil — never resets score.
  *
  * Product rule:
- *   Local trial lasts PREMIUM_TRIAL_DAYS from a valid trialStartedAt.
- *   Trial write/seed is Storage/Journey at onboarding / Calendar Day 1 — not this file.
+ *   Local trial covers wall days 1 … PREMIUM_TRIAL_DAYS since appStartDate (install), across journeys.
+ *   Trial write/seed is Storage/Journey at onboarding — not this file.
  *   All trial-tier UI uses Entitlement.hasPremiumAccess() only.
  *
  * Trial calc ownership: Entitlement
@@ -85,8 +85,57 @@ var Entitlement = (function () {
         return s || (typeof state !== 'undefined' ? state : null) || {};
     }
 
+    function trialStarted(s) {
+        s = snapshot(s);
+        return !!s.trialStartedAt;
+    }
+
+    /** Install Day 1 (YYYY-MM-DD) for trial window — read-only. */
+    function getAppStartWallDateForTrial(s) {
+        s = snapshot(s);
+        if (typeof readAppStartWallDate === 'function') {
+            var fromState = readAppStartWallDate(s);
+            if (fromState) return fromState;
+        }
+        if (s.appStartDate && /^\d{4}-\d{2}-\d{2}$/.test(s.appStartDate)) {
+            return s.appStartDate;
+        }
+        if (s.trialStartedAt) {
+            var start = new Date(s.trialStartedAt);
+            if (!Number.isNaN(start.getTime()) && typeof dateKeyFromDate === 'function') {
+                return dateKeyFromDate(start);
+            }
+        }
+        return '';
+    }
+
+    /** 1-based wall day since appStartDate through today (trial day index). */
+    function getAppTrialDayIndex(s) {
+        s = snapshot(s);
+        if (!trialStarted(s)) return 0;
+        var anchor = getAppStartWallDateForTrial(s);
+        if (!anchor || typeof todayKey !== 'function' || typeof daysBetweenKeys !== 'function') {
+            return 1;
+        }
+        var today = todayKey();
+        if (today < anchor) return 1;
+        return Math.max(1, daysBetweenKeys(anchor, today) + 1);
+    }
+
+    /** End of local day PREMIUM_TRIAL_DAYS since app install. */
     function getTrialEndsAt(s) {
         s = snapshot(s);
+        if (!trialStarted(s)) return null;
+        var anchor = getAppStartWallDateForTrial(s);
+        if (anchor && /^\d{4}-\d{2}-\d{2}$/.test(anchor) && typeof addDaysToKey === 'function') {
+            var lastKey = addDaysToKey(anchor, PREMIUM_TRIAL_DAYS - 1);
+            var parts = lastKey.split('-');
+            var y = parseInt(parts[0], 10);
+            var m = parseInt(parts[1], 10) - 1;
+            var d = parseInt(parts[2], 10);
+            var end = new Date(y, m, d, 23, 59, 59, 999);
+            if (!Number.isNaN(end.getTime())) return end;
+        }
         if (!s.trialStartedAt) return null;
         var start = new Date(s.trialStartedAt);
         if (Number.isNaN(start.getTime())) return null;
@@ -100,12 +149,11 @@ var Entitlement = (function () {
         return !Number.isNaN(until.getTime()) && until.getTime() > Date.now();
     }
 
-    /** True while trialStartedAt + PREMIUM_TRIAL_DAYS is still in the future (wall-clock). */
+    /** True on install wall days 1 … PREMIUM_TRIAL_DAYS (appStartDate), across journeys. */
     function isTrialActive(s) {
         s = snapshot(s);
-        var ends = getTrialEndsAt(s);
-        if (!ends) return false;
-        return ends.getTime() > Date.now();
+        if (!trialStarted(s)) return false;
+        return getAppTrialDayIndex(s) <= PREMIUM_TRIAL_DAYS;
     }
 
     /** Single access answer: paid subscription OR open trial window. */
@@ -120,8 +168,10 @@ var Entitlement = (function () {
     function getAccessExpiresAt(s) {
         s = snapshot(s);
         if (isSubscriptionActive(s) && s.premiumUntil) return s.premiumUntil;
-        var ends = getTrialEndsAt(s);
-        if (ends && ends.getTime() > Date.now()) return ends.toISOString();
+        if (isTrialActive(s)) {
+            var ends = getTrialEndsAt(s);
+            if (ends) return ends.toISOString();
+        }
         return null;
     }
 
@@ -145,11 +195,8 @@ var Entitlement = (function () {
             var subMs = until.getTime() - Date.now();
             return subMs <= 0 ? 0 : Math.ceil(subMs / MS_PER_DAY);
         }
-        var ends = getTrialEndsAt(s);
-        if (!ends) return 0;
-        var ms = ends.getTime() - Date.now();
-        if (ms <= 0) return 0;
-        return Math.ceil(ms / MS_PER_DAY);
+        if (!trialStarted(s) || !isTrialActive(s)) return 0;
+        return Math.max(0, PREMIUM_TRIAL_DAYS - getAppTrialDayIndex(s) + 1);
     }
 
     function isBasicTier(s) {

@@ -23,8 +23,18 @@ function toggleLifetimePanel() {
 }
 
 function toggleBestPerformancesPanel() {
-    if (!requirePremium()) return;
+    if (!canAccessJourneyGracePremiumFeature()) {
+        requirePremium();
+        return;
+    }
     bestPerformancesPanelOpen = !bestPerformancesPanelOpen;
+    syncHistoryPanels();
+}
+
+/** Collapse Personal Bests when journey-grace lock applies (e.g. start of journey 3). */
+function collapseBestPerformancesPanelForPremiumLock() {
+    if (typeof bestPerformancesPanelOpen === 'undefined' || !bestPerformancesPanelOpen) return;
+    bestPerformancesPanelOpen = false;
     syncHistoryPanels();
 }
 

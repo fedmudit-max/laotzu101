@@ -50,7 +50,24 @@ function formatAmountLike(referencePrice, amount) {
  * Annual compare: strikethrough = PREMIUM_ANNUAL_COMPARE_AMOUNT (2299),
  * badge = % off vs the annual sale price.
  */
+function showPlanPricesInUi() {
+    return typeof KING_SHOW_PLAN_PRICES === 'undefined' || KING_SHOW_PLAN_PRICES === true;
+}
+
+function stripVisiblePlanPrices(plans) {
+    return (plans || []).map(function (p) {
+        var copy = Object.assign({}, p);
+        delete copy.price;
+        delete copy.listPrice;
+        delete copy.listAmount;
+        delete copy.amount;
+        delete copy.discountPct;
+        return copy;
+    });
+}
+
 function enrichAnnualSavings(plans) {
+    if (!showPlanPricesInUi()) return plans || [];
     var list = plans || [];
     var annual = null;
     for (var i = 0; i < list.length; i++) {
@@ -86,21 +103,23 @@ function normalizePremiumPlan(p) {
     var period = p.period || (id === 'annual' ? 'year' : 'month');
     var plan = { id: id, period: period };
 
-    if (p.price) {
-        plan.price = String(p.price);
-    } else if (amount > 0) {
-        plan.price = '₹' + amount + planPeriodSuffix(period, id);
-    }
-    if (amount > 0) plan.amount = amount;
+    if (showPlanPricesInUi()) {
+        if (p.price) {
+            plan.price = String(p.price);
+        } else if (amount > 0) {
+            plan.price = '₹' + amount + planPeriodSuffix(period, id);
+        }
+        if (amount > 0) plan.amount = amount;
 
-    if (id !== 'annual') {
-        if (p.listPrice) {
-            plan.listPrice = String(p.listPrice);
-            if (p.discountPct) plan.discountPct = p.discountPct;
-        } else if (listAmount > 0 && amount > 0 && listAmount > amount) {
-            plan.listAmount = listAmount;
-            plan.listPrice = '₹' + listAmount;
-            plan.discountPct = planDiscountPercent(listAmount, amount);
+        if (id !== 'annual') {
+            if (p.listPrice) {
+                plan.listPrice = String(p.listPrice);
+                if (p.discountPct) plan.discountPct = p.discountPct;
+            } else if (listAmount > 0 && amount > 0 && listAmount > amount) {
+                plan.listAmount = listAmount;
+                plan.listPrice = '₹' + listAmount;
+                plan.discountPct = planDiscountPercent(listAmount, amount);
+            }
         }
     }
 
@@ -160,37 +179,42 @@ function setPremiumOfferFromStore(offer) {
  * Access must not read this — Entitlement.getAccess() owns “is Premium?”.
  */
 function getPremiumOffer() {
+    function withDisplayPlans(offer) {
+        if (!offer || !offer.plans) return offer;
+        if (showPlanPricesInUi()) return offer;
+        return Object.assign({}, offer, { plans: stripVisiblePlanPrices(offer.plans) });
+    }
     if (storePremiumOffer && storePremiumOffer.plans && storePremiumOffer.plans.length) {
-        return {
+        return withDisplayPlans({
             trialDays: storePremiumOffer.trialDays || PREMIUM_TRIAL_DAYS,
             plans: storePremiumOffer.plans,
             source: storePremiumOffer.source || 'store',
-        };
+        });
     }
     if (usesNativeBillingPricing()) {
         if (premiumOfferLoadState === 'unavailable') {
-            return {
+            return withDisplayPlans({
                 trialDays: PREMIUM_TRIAL_DAYS,
                 plans: [],
                 source: 'unavailable',
-            };
+            });
         }
-        return {
+        return withDisplayPlans({
             trialDays: PREMIUM_TRIAL_DAYS,
             plans: [],
             source: 'loading',
-        };
+        });
     }
     if (allowsMockPremiumPricing()) {
-        return {
+        return withDisplayPlans({
             trialDays: PREMIUM_TRIAL_DAYS,
             plans: normalizePremiumPlans(PREMIUM_PLANS_MOCK, true),
             source: 'mock',
-        };
+        });
     }
-    return {
+    return withDisplayPlans({
         trialDays: PREMIUM_TRIAL_DAYS,
         plans: [],
         source: 'web',
-    };
+    });
 }
