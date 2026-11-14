@@ -7,7 +7,7 @@
  * Internal billing test: SUBSCRIPTION_UI true, FRIENDS_FULL_ACCESS false.
  */
 /** Flipped per release track; not const so harness can override in tests. */
-var KING_SUBSCRIPTION_UI_ENABLED = false;
+var KING_SUBSCRIPTION_UI_ENABLED = true;
 var KING_FRIENDS_BUILD_FULL_ACCESS = false;
 /** When true, purchases use RevenueCat (Play + App Store). Requires cap sync + API keys below. */
 var KING_USE_REVENUECAT = false;
