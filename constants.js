@@ -9,6 +9,18 @@
 /** Flipped per release track; not const so harness can override in tests. */
 var KING_SUBSCRIPTION_UI_ENABLED = false;
 var KING_FRIENDS_BUILD_FULL_ACCESS = false;
+/** When true, purchases use RevenueCat (Play + App Store). Requires cap sync + API keys below. */
+var KING_USE_REVENUECAT = false;
+/** RevenueCat public SDK keys (safe in app). Empty until dashboard setup. */
+var REVENUECAT_API_KEY_ANDROID = '';
+var REVENUECAT_API_KEY_IOS = '';
+/** Must match RevenueCat dashboard entitlement identifier. */
+var REVENUECAT_ENTITLEMENT_ID = 'premium';
+/** Package identifiers in the default RevenueCat offering → King plan ids. */
+var REVENUECAT_PACKAGE_IDENTIFIERS = {
+    monthly: 'monthly',
+    annual: 'annual',
+};
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const MAX_FAILURES = 10;

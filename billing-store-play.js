@@ -20,7 +20,7 @@ var playPurchasesListenerBound = false;
  */
 function updateEntitlementSnapshot(fields) {
     if (!fields || typeof fields !== 'object') return;
-    if (fields.source !== 'play' && fields.source !== 'restore') return;
+    if (fields.source !== 'play' && fields.source !== 'restore' && fields.source !== 'revenuecat') return;
     if (fields.premiumUntil !== undefined) state.premiumUntil = fields.premiumUntil;
     if (fields.lastVerifiedAt !== undefined) state.lastVerifiedAt = fields.lastVerifiedAt;
     state.source = fields.source;
@@ -212,6 +212,93 @@ function refreshPlayPurchasesSilent() {
         applyPlayPurchaseQuery(result, 'play');
         unlockPremiumFeatures();
     }).catch(function () {});
+}
+
+function startPremiumCheckoutNativePlay(planId) {
+    planId = planId || (typeof selectedPremiumPlanId !== 'undefined' ? selectedPremiumPlanId : 'annual');
+    var plugin = getKingBillingPlugin();
+    if (!plugin) {
+        showToast(0, 'Subscribe uses Google Play on the Android app.');
+        return;
+    }
+    var offer = getPremiumOffer();
+    if (!offer.plans || !offer.plans.length) {
+        if (offer.source === 'loading') {
+            showToast(0, 'Price is still loading from Google Play.');
+        } else {
+            showToast(0, 'Price unavailable from Google Play. Try again later.');
+        }
+        return;
+    }
+    var spec = playOfferSpecForPlan(planId);
+    if (!spec || !spec.productId) {
+        showToast(0, 'Pick a Premium plan first.');
+        return;
+    }
+    if (playCheckoutInFlight) return;
+    playCheckoutInFlight = true;
+    setCheckoutBusy(true);
+    callKingBilling('purchase', spec)
+        .then(function (result) {
+            if (result && result.canceled) return;
+            if (result && result.ok && findActivePlaySubscription(result.purchases)) {
+                applyPlayPurchaseQuery(result, 'play');
+                onPremiumActivated();
+                return;
+            }
+            if (result && result.responseCode === 7 /* ITEM_ALREADY_OWNED */) {
+                return restoreAfterAlreadyOwned();
+            }
+            if (result && result.message === 'no-matching-offer') {
+                showToast(0, 'No matching Play base plan for this product. Set basePlanId in PREMIUM_PLAY_PRODUCTS after creating it in Play Console.');
+                return;
+            }
+            if (!result || !result.ok) {
+                showToast(0, 'Couldn’t start Google Play checkout. Use a Play testing build and a network connection.');
+            }
+        })
+        .catch(function () {
+            showToast(0, 'Couldn’t start Google Play checkout. Use a Play testing build and a network connection.');
+        })
+        .then(function () {
+            playCheckoutInFlight = false;
+            setCheckoutBusy(false);
+        });
+}
+
+function restorePremiumAccessNativePlay() {
+    var plugin = getKingBillingPlugin();
+    if (!plugin) {
+        showToast(0, 'Restore uses Google Play on the Android app.');
+        return;
+    }
+    if (playRestoreInFlight) return;
+    playRestoreInFlight = true;
+    setRestoreBusy(true);
+    callKingBilling('queryPurchases', {})
+        .then(function (result) {
+            if (!result || !result.ok) {
+                showToast(0, 'Couldn’t reach Google Play. Try again with Play installed and a network connection.');
+                return;
+            }
+            var hadPaid = Entitlement.isSubscriptionActive();
+            var next = applyPlayPurchaseQuery(result, 'restore');
+            if (next.active) {
+                unlockPremiumFeatures();
+                closePremiumSheet();
+                showToast(0, hadPaid ? 'Premium is active.' : 'Premium restored 👑');
+                return;
+            }
+            unlockPremiumFeatures();
+            showToast(0, 'No active Premium subscription on this Google account.');
+        })
+        .catch(function () {
+            showToast(0, 'Couldn’t reach Google Play. Try again with Play installed and a network connection.');
+        })
+        .then(function () {
+            playRestoreInFlight = false;
+            setRestoreBusy(false);
+        });
 }
 
 function bindPlayPurchasesListener() {

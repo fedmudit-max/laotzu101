@@ -66,6 +66,8 @@ function createKingContext() {
         'backup.js',
         'billing-offers.js',
         'billing-store-play.js',
+        'billing-store-revenuecat.js',
+        'billing-platform.js',
         'billing-ui.js',
     ];
     for (const file of files) {

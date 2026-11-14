@@ -138,6 +138,9 @@ function normalizePremiumPlans(plans, allowMockFallback) {
 }
 
 function usesNativeBillingPricing() {
+    if (typeof isNativePremiumStoreAvailable === 'function') {
+        return isNativePremiumStoreAvailable();
+    }
     return !!getKingBillingPlugin();
 }
 

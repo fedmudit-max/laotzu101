@@ -96,13 +96,15 @@ logic-storage-state → logic-dates-log → logic-journey → logic-streak → l
 **Billing split** (load after `entitlement.js`):
 
 ```text
-billing-offers.js → billing-store-play.js → billing-ui.js
+billing-offers.js → billing-store-play.js → billing-store-revenuecat.js → billing-platform.js → billing-ui.js
 ```
 
 | File | Owns | Must not own |
 |------|------|----------------|
 | `billing-offers.js` | Plan normalize/enrich, `getPremiumOffer`, load state, `setPremiumOfferFromStore` | Play I/O, paywall DOM |
 | `billing-store-play.js` | Play query/purchase/restore, `updateEntitlementSnapshot` | Paywall render (calls `refreshPremiumOfferUiIfVisible` only) |
+| `billing-store-revenuecat.js` | RevenueCat configure/offerings/purchase/restore | Same; gated by `KING_USE_REVENUECAT` |
+| `billing-platform.js` | Routes to Play or RevenueCat | — |
 | `billing-ui.js` | Panel, paywall, tier gating, checkout/restore UX | Direct entitlement rules (asks `Entitlement`) |
 
 V2 iOS: add `billing-store-apple.js`; UI stays store-agnostic via `getPremiumOffer()`.

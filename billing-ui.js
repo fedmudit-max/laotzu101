@@ -144,10 +144,6 @@ function syncPremiumPanelCollapse() {
     if (premiumPanelOpen) renderPremiumPanelContent();
 }
 
-function syncPremiumPanel() {
-    renderPremiumPanelContent();
-}
-
 function formatTrialDaysLeft(left) {
     return left === 1 ? '1 free day left' : left + ' free days left';
 }
@@ -380,7 +376,7 @@ function openPremiumSheet() {
         trialDays: offer.trialDays,
         plans: offer.plans,
     });
-    loadPlayOffers();
+    loadStoreOffers();
 }
 
 function closePremiumSheet() {
@@ -400,54 +396,26 @@ function requirePremium() {
 
 function startPremiumCheckout() {
     if (!isSubscriptionCommerceUiEnabled()) return;
-    var plugin = getKingBillingPlugin();
-    if (!plugin) {
-        showToast(0, 'Subscribe uses Google Play on the Android app.');
-        return;
-    }
     var offer = getPremiumOffer();
     if (!offer.plans || !offer.plans.length) {
         if (offer.source === 'loading') {
-            showToast(0, 'Price is still loading from Google Play.');
+            showToast(0, 'Price is still loading.');
         } else {
-            showToast(0, 'Price unavailable from Google Play. Try again later.');
+            showToast(0, 'Price unavailable. Try again later.');
         }
         return;
     }
-    var spec = playOfferSpecForPlan(selectedPremiumPlanId);
-    if (!spec || !spec.productId) {
-        showToast(0, 'Pick a Premium plan first.');
+    if (typeof storeBillingUsesRevenueCat === 'function' && storeBillingUsesRevenueCat()) {
+        setCheckoutBusy(true);
+        var p = startStoreCheckout(selectedPremiumPlanId);
+        if (p && typeof p.then === 'function') {
+            p.then(function () { setCheckoutBusy(false); });
+        } else {
+            setCheckoutBusy(false);
+        }
         return;
     }
-    if (playCheckoutInFlight) return;
-    playCheckoutInFlight = true;
-    setCheckoutBusy(true);
-    callKingBilling('purchase', spec)
-        .then(function (result) {
-            if (result && result.canceled) return;
-            if (result && result.ok && findActivePlaySubscription(result.purchases)) {
-                applyPlayPurchaseQuery(result, 'play');
-                onPremiumActivated();
-                return;
-            }
-            if (result && result.responseCode === 7 /* ITEM_ALREADY_OWNED */) {
-                return restoreAfterAlreadyOwned();
-            }
-            if (result && result.message === 'no-matching-offer') {
-                showToast(0, 'No matching Play base plan for this product. Set basePlanId in PREMIUM_PLAY_PRODUCTS after creating it in Play Console.');
-                return;
-            }
-            if (!result || !result.ok) {
-                showToast(0, 'Couldn’t start Google Play checkout. Use a Play testing build and a network connection.');
-            }
-        })
-        .catch(function () {
-            showToast(0, 'Couldn’t start Google Play checkout. Use a Play testing build and a network connection.');
-        })
-        .then(function () {
-            playCheckoutInFlight = false;
-            setCheckoutBusy(false);
-        });
+    startPremiumCheckoutNativePlay(selectedPremiumPlanId);
 }
 
 function setCheckoutBusy(busy) {
@@ -464,38 +432,17 @@ function setCheckoutBusy(busy) {
 
 function restorePremiumAccess() {
     if (!isSubscriptionCommerceUiEnabled()) return;
-    var plugin = getKingBillingPlugin();
-    if (!plugin) {
-        showToast(0, 'Restore uses Google Play on the Android app.');
+    if (typeof storeBillingUsesRevenueCat === 'function' && storeBillingUsesRevenueCat()) {
+        setRestoreBusy(true);
+        var p = restoreStoreAccess();
+        if (p && typeof p.then === 'function') {
+            p.then(function () { setRestoreBusy(false); });
+        } else {
+            setRestoreBusy(false);
+        }
         return;
     }
-    if (playRestoreInFlight) return;
-    playRestoreInFlight = true;
-    setRestoreBusy(true);
-    callKingBilling('queryPurchases', {})
-        .then(function (result) {
-            if (!result || !result.ok) {
-                showToast(0, 'Couldn’t reach Google Play. Try again with Play installed and a network connection.');
-                return;
-            }
-            var hadPaid = Entitlement.isSubscriptionActive();
-            var next = applyPlayPurchaseQuery(result, 'restore');
-            if (next.active) {
-                unlockPremiumFeatures();
-                closePremiumSheet();
-                showToast(0, hadPaid ? 'Premium is active.' : 'Premium restored 👑');
-                return;
-            }
-            unlockPremiumFeatures();
-            showToast(0, 'No active Premium subscription on this Google account.');
-        })
-        .catch(function () {
-            showToast(0, 'Couldn’t reach Google Play. Try again with Play installed and a network connection.');
-        })
-        .then(function () {
-            playRestoreInFlight = false;
-            setRestoreBusy(false);
-        });
+    restorePremiumAccessNativePlay();
 }
 
 function setRestoreBusy(busy) {
@@ -546,9 +493,9 @@ function initPremiumStartup() {
     }
     syncPremiumPanelCollapse();
     if (isSubscriptionCommerceUiEnabled()) {
-        bindPlayPurchasesListener();
-        loadPlayOffers();
-        refreshPlayPurchasesSilent();
+        initStoreBilling();
+        loadStoreOffers();
+        refreshStorePurchasesSilent();
     }
     applyPremiumTierLayout();
 }

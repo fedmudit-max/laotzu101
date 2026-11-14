@@ -77,6 +77,20 @@ test('getPremiumOffer never shows mock on production web host', () => {
     assert.equal(offer.plans.length, 0);
 });
 
+test('updateEntitlementSnapshot accepts revenuecat source', () => {
+    const ctx = createKingContext();
+    resetKing(ctx);
+    const until = isoDaysFromNow(3);
+    ctx.updateEntitlementSnapshot({
+        source: 'revenuecat',
+        premiumUntil: until,
+        lastVerifiedAt: isoDaysFromNow(0),
+    });
+    const s = getState(ctx);
+    assert.equal(s.premiumUntil, until);
+    assert.equal(s.source, 'revenuecat');
+});
+
 test('updateEntitlementSnapshot ignores non-play sources', () => {
     const ctx = createKingContext();
     resetKing(ctx);
