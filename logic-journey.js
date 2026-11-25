@@ -9,7 +9,7 @@
  *   4. Milestones — counters + UI celebration copy
  *   5. Lifecycle commands — onboarding, archive, heal, next journey
  *
- * Stuck after 10 slips → healStrandedJourneyEnd, pendingNextJourney, archiveCompletedJourney.
+ * Stuck after 5 slips → healStrandedJourneyEnd, pendingNextJourney, archiveCompletedJourney.
  * Streak may call QUERIES only — LIFECYCLE COMMANDS at bottom (ARCHITECTURE.md).
  */
 

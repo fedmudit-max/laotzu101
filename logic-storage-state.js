@@ -13,13 +13,13 @@
  * appStartDate        First-ever Day 1        Never resets; month grid greys days before install
  * lastOpenedDate      Last active calendar day  Set on log / catch-up; used to detect absence
  * lastCheckedDate     Last successful day-roll  Unset while yesterday popup is waiting
- * journeyEndedDate    Wall date of 10th slip    Empty unless pendingNextJourney
+ * journeyEndedDate    Wall date of 5th slip     Empty unless pendingNextJourney
  * pendingNextJourney  Between journeys          Logging blocked until canBeginNextJourneyToday
  * todayStatus         today only                none | success | failed — never for yesterday
  * todayFailCount      1 when today is a slip day (legacy field; one slip per day)
  * currentStreak       Live consecutive strong   Always recompute from dailyLog (not tap order)
  * longestStreak       All-time streak peak
- * score.success/fail  Journey strong / slips    Permanent bestJourney writes only at 10 slips
+ * score.success/fail  Journey strong / slips    Permanent bestJourney writes only at 5 slips
  * dailyLog            YYYY-MM-DD → strong|slip  Source of truth for calendar + streak recompute
  * lastFreezeStreak/Date  UI grey after today's first slip only
  */

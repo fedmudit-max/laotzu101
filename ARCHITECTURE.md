@@ -25,7 +25,7 @@ This document defines implementation boundaries. Changes require an implementati
 
 | Concern | Owner |
 |---------|--------|
-| Google Play purchase / restore | **Billing** (`billing-store-play.js` + `KingBilling` native plugin) |
+| Google Play purchase / restore | **Billing** (RevenueCat `billing-store-revenuecat.js` → Play via Purchases SDK) |
 | Localized Premium price (store offer) | **Billing** (`billing-offers.js` → `getPremiumOffer`) |
 | Trial calculation / access answers | **Entitlement** (`entitlement.js`) |
 | Journey scoring, days, slips | **Logic** (`logic-storage-state`, `logic-dates-log`, `logic-journey`, `logic-streak`, `logic-logging`) |
@@ -53,10 +53,10 @@ Source of truth for field meaning: comment at the top of `logic-storage-state.js
 | `appStartDate` | First-ever Day 1 (never resets) |
 | `lastOpenedDate` | Last day the user was active (absence detection) |
 | `lastCheckedDate` | Last finished day-roll (empty while yesterday popup waits) |
-| `journeyEndedDate` / `pendingNextJourney` | 10th-slip date / between-journey lock |
+| `journeyEndedDate` / `pendingNextJourney` | 5th-slip date / between-journey lock |
 | `todayStatus` / `todayFailCount` | **Today only** — never bump from a historical slip |
 | `currentStreak` | Recompute from `dailyLog` (not logging order) |
-| `score` / `bestJourney` | Strong/slips; permanent Best only at 10 slips |
+| `score` / `bestJourney` | Strong/slips; permanent Best only at 5 slips |
 | `dailyLog` | Per wall date strong or slip |
 
 ---
@@ -96,15 +96,15 @@ logic-storage-state → logic-dates-log → logic-journey → logic-streak → l
 **Billing split** (load after `entitlement.js`):
 
 ```text
-billing-offers.js → billing-store-play.js → billing-store-revenuecat.js → billing-platform.js → billing-ui.js
+billing-offers.js → billing-entitlement-snapshot.js → billing-store-revenuecat.js → billing-platform.js → billing-ui.js
 ```
 
 | File | Owns | Must not own |
 |------|------|----------------|
 | `billing-offers.js` | Plan normalize/enrich, `getPremiumOffer`, load state, `setPremiumOfferFromStore` | Play I/O, paywall DOM |
-| `billing-store-play.js` | Play query/purchase/restore, `updateEntitlementSnapshot` | Paywall render (calls `refreshPremiumOfferUiIfVisible` only) |
-| `billing-store-revenuecat.js` | RevenueCat configure/offerings/purchase/restore | Same; gated by `KING_USE_REVENUECAT` |
-| `billing-platform.js` | Routes to Play or RevenueCat | — |
+| `billing-entitlement-snapshot.js` | `updateEntitlementSnapshot` (paid / restore / backup writes) | Play I/O |
+| `billing-store-revenuecat.js` | RevenueCat configure/offerings/purchase/restore | Paywall render |
+| `billing-platform.js` | Init, offers, checkout, restore — **RevenueCat only** when `KING_USE_REVENUECAT` | Legacy Play JS fallback |
 | `billing-ui.js` | Panel, paywall, tier gating, checkout/restore UX | Direct entitlement rules (asks `Entitlement`) |
 
 V2 iOS: add `billing-store-apple.js`; UI stays store-agnostic via `getPremiumOffer()`.
@@ -145,7 +145,7 @@ Keep read-only gates separate from mutating lifecycle. **Streak may call queries
 ```text
 // Read-only queries (streak.js may call these — never lifecycle commands)
 isAwaitingNextJourney(s)
-journeyIsOver(s)                    // active journey ended at 10 slips
+journeyIsOver(s)                    // active journey ended at 5 slips
 canLogToday()                       // !awaiting && !journeyIsOver
 canBeginNextJourneyToday()
 readJourneyAnchorWallDate(s)          // persisted only — no infer/write
@@ -200,7 +200,7 @@ Unit tests on one function miss ordering bugs. The integration path must work en
 
 ```text
 mergeSavedState(saved)
-  → healStrandedJourneyEnd(state)   // stranded 10-slip finish
+  → healStrandedJourneyEnd(state)   // stranded 5-slip finish
   → recomputeCurrentStreak(state)    // stale streak cache
   → saveToStorage(state)
   → renderAll()                       // UI can log again
@@ -212,7 +212,7 @@ mergeSavedState(saved)
 - Older backup schema (missing optional fields)
 - Partially corrupted fields
 - Active journey at restore
-- Stranded/completed journey (`score.fail >= 10` but no archive)
+- Stranded/completed journey (`score.fail >= 5` but no archive)
 - Streak needing recomputation
 - Empty / new-user backup
 - After restore: `canLogToday()` true and `applyStrongDay` / `applySlipDay` apply (not only JSON equality)
@@ -230,7 +230,7 @@ boot.js (data-action click)
   → ui-actions.js: recordSuccess / recordFailure
   → logic-logging.js: applyStrongDay / applySlipDay   ← orchestration
        → logic-dates-log: writeDailyLog, wall-date checks
-       → logic-journey: score, milestones, archive on 10th slip
+       → logic-journey: score, milestones, archive on 5th slip
        → logic-streak: recomputeCurrentStreak
   → ui-main.js: saveAndRender → saveToStorage → renderAll
 ```
@@ -244,7 +244,7 @@ If buttons feel dead, check **queries before UI:** `canLogToday()`, `isYesterday
 3. `journeyStartDate` / `calendarDay` (journey anchor — not interchangeable with `appStartDate`).
 4. Do not “fix” by manually bumping `currentStreak` without updating `dailyLog`.
 
-#### Journey stuck after 10 slips
+#### Journey stuck after 5 slips
 
 1. `healStrandedJourneyEnd` — init and import both call it.
 2. `archiveCompletedJourney` / `beginNextJourney`.
@@ -266,9 +266,9 @@ If buttons feel dead, check **queries before UI:** `canLogToday()`, `isYesterday
 npm test
 ```
 
-**93** tests across `tests/*.test.js` (`node --test --test-concurrency=1`).
+**193** tests across `tests/*.test.js` (`node --test --test-concurrency=1`).
 
-Harness loads `constants`, `data`, `migration`, `logic`, `entitlement`, `backup`, `billing-offers` / `billing-store-play` / `billing-ui` in a VM (`tests/helpers/king-harness.js`). Use `createKingContext()` and `getState(ctx)` — `state` is not a normal sandbox export.
+Harness loads `constants`, `data`, `migration`, `logic`, `entitlement`, `backup`, `billing-offers` / `billing-entitlement-snapshot` / `billing-store-revenuecat` / `billing-platform` / `billing-ui` in a VM (`tests/helpers/king-harness.js`). Use `createKingContext()` and `getState(ctx)` — `state` is not a normal sandbox export.
 
 #### After app-visible JS changes
 
@@ -294,7 +294,7 @@ Enable + time UI lives in the **Reminder** card (below Lifetime Stats). Time is 
 Boot
   → Load local storage
   → Initialize Firebase        (no-op until Sprint 3)
-  → Restore purchases          (`KingBilling.queryPurchases` on Android)
+  → Restore purchases          (RevenueCat `restorePurchases` on Android)
   → Refresh entitlement        (reads local state)
   → Load journey
   → Render UI
@@ -311,7 +311,7 @@ Only the entitlement update path may modify entitlement state.
 
 Billing / Firebase
         ↓
-updateEntitlementSnapshot(...)   ← single write API (`billing-store-play.js`)
+updateEntitlementSnapshot(...)   ← single write API (`billing-entitlement-snapshot.js`)
         ↓
 Storage (state + localStorage)
         ↓
@@ -369,7 +369,7 @@ Unlocking King **never** reads a price. The Premium modal is a display shell:
 showPremiumModal({ trialDays, plans })
 ```
 
-Today `PREMIUM_PLANS_MOCK` is for **localhost / node tests only**. GitHub Pages and Android never show mock INR — web shows `PREMIUM_PRICE_WEB_HINT`; Android shows Play prices when `queryProducts` succeeds, otherwise loading or unavailable.
+Today `PREMIUM_PLANS_MOCK` is for **localhost / node tests only**. GitHub Pages and Android never show mock INR — web shows `PREMIUM_PRICE_WEB_HINT`; Android shows RevenueCat store prices when offerings load, otherwise loading or unavailable.
 
 ```text
 Entitlement.getAccess()
@@ -377,10 +377,10 @@ Entitlement.getAccess()
   active?  YES → unlock Premium features
            NO  → showPremiumModal({ trialDays, plans })
 
-Google Play (KingBilling)
+RevenueCat offerings
         ↓
-  localized monthly + annual formattedPrice
-  (annual strikethrough = PREMIUM_ANNUAL_COMPARE_AMOUNT; “% off” vs annual sale)
+  localized monthly + annual `priceString` / amounts
+  (annual savings badge = monthly×12 vs annual, same currency only)
         ↓
   same showPremiumModal(...)
 ```
@@ -392,7 +392,7 @@ Google Play (KingBilling)
 - [x] User gets a local trial (`PREMIUM_TRIAL_DAYS` in `constants.js`).
 - [x] Trial expiry locks premium features.
 - [ ] Google Play purchase unlocks premium (native flow lives; Play Console products + a Play-signed test build still required).
-- [x] Restore queries Play (`KingBilling.queryPurchases`) — empty until those products exist.
+- [x] Restore uses RevenueCat (`restorePurchases`) — needs live offerings + Play products.
 - [x] Journey data remains local (purchase writes entitlement fields only).
 - [ ] App passes closed testing.
 
@@ -410,7 +410,7 @@ Google Play (KingBilling)
 2. Build release: `cd android && ./gradlew :app:assembleRelease` (or Play App Signing flow).
 3. Install release APK on a **physical device** — not debug.
 4. Smoke-test:
-   - `KingBilling` — `queryProducts`, `queryPurchases` (restore)
+   - RevenueCat subscribe + restore on a Play-signed build
    - `KingReminder` — schedule alarm, notification tap logs strong/slip
 5. Only then ship a minified build to Play.
 

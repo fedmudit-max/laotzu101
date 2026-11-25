@@ -142,7 +142,7 @@ function logYesterday(result) {
         handleStrongDayUI(applyStrongDay({ logDate: yKey, suppressUI: false }), false);
     } else {
         var slipResult = applySlipDay({ logDate: yKey, calDay: getCalendarDayForWallDate(yKey) });
-        // End date = yesterday when the 10th slip is attributed to N-1 (not open day N).
+        // End date = yesterday when the 5th slip is attributed to N-1 (not open day N).
         if (slipResult && slipResult.applied && journeyIsOver(state)) {
             completeEndJourney(yKey);
             return;

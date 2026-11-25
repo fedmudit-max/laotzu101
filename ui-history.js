@@ -136,6 +136,8 @@ function switchBestPerformancesMode(mode) {
 // ════════════════════════════════════════════════════════
 
 const STREAKS_PER_PAGE = 10;
+/** Live journey: up to 10 slip-ended segments + in-progress streak on one page (never orphan S{n}…). */
+const STREAKS_PER_PAGE_LIVE = STREAKS_PER_PAGE + 1;
 const JOURNEYS_PER_PAGE = 6;
 
 function getChartWindow() {
@@ -153,9 +155,17 @@ function updateChartNavButtons(canGoLeft, canGoRight, hasNav) {
     nextBtn.disabled = !canGoRight;
 }
 
+function journeyAttemptInPastStreaks(attempt) {
+    var past = state.pastJourneyStreaks || [];
+    for (var i = 0; i < past.length; i++) {
+        if (past[i] && past[i].attempt === attempt) return true;
+    }
+    return false;
+}
+
 /** Completed + current journeys with their streak segments. */
 function getJourneyStreakEntries() {
-    const entries = state.pastJourneyStreaks.map(journey => ({
+    const entries = (state.pastJourneyStreaks || []).map(journey => ({
         attempt: journey.attempt,
         streaks: [...(journey.streaks || [])],
         isLive: false,
@@ -163,9 +173,14 @@ function getJourneyStreakEntries() {
 
     const currentStreaks = [...(state.currentJourneyStreaks || [])];
     const hasLiveStreak = state.currentStreak > 0;
-    if (!isAwaitingNextJourney() && (currentStreaks.length > 0 || hasLiveStreak)) {
+    var attempt = state.attempt;
+    // After archive, streaks are copied to pastJourneyStreaks but currentJourneyStreaks
+    // stays until beginNextJourney — never chart the same attempt twice (S31 alone + S32–40).
+    if (!isAwaitingNextJourney()
+        && (currentStreaks.length > 0 || hasLiveStreak)
+        && !journeyAttemptInPastStreaks(attempt)) {
         entries.push({
-            attempt: state.attempt,
+            attempt: attempt,
             streaks: currentStreaks,
             currentStreak: state.currentStreak,
             isLive: true,
@@ -175,7 +190,11 @@ function getJourneyStreakEntries() {
     return entries;
 }
 
-/** Streak mode: one journey per page slice (max 10 streaks, never mixed across journeys). */
+/** Streak mode: one journey per slice — never mixed across journeys; live attempt stays on one page. */
+function streakPageSizeForJourney(isLive) {
+    return isLive ? STREAKS_PER_PAGE_LIVE : STREAKS_PER_PAGE;
+}
+
 function buildStreakChartPages() {
     const pages = [];
     let streakNum = 1;
@@ -195,15 +214,26 @@ function buildStreakChartPages() {
             streakNum++;
         }
 
-        for (let i = 0; i < journeyPoints.length; i += STREAKS_PER_PAGE) {
+        var pageSize = streakPageSizeForJourney(journey.isLive);
+        for (let i = 0; i < journeyPoints.length; i += pageSize) {
             pages.push({
                 attempt: journey.attempt,
-                points: journeyPoints.slice(i, i + STREAKS_PER_PAGE),
+                points: journeyPoints.slice(i, i + pageSize),
             });
         }
     });
 
     return pages;
+}
+
+/** First chart page that shows the latest journey (all its streak segments start here). */
+function streakChartPageForLatestJourney(pages) {
+    if (!pages || !pages.length) return 0;
+    var latestAttempt = pages[pages.length - 1].attempt;
+    for (var i = 0; i < pages.length; i++) {
+        if (pages[i].attempt === latestAttempt) return i;
+    }
+    return pages.length - 1;
 }
 
 function getAllStreakPoints() {
@@ -255,7 +285,11 @@ function getChartPagination() {
 
     const pages = buildStreakChartPages();
     const maxPage = Math.max(0, pages.length - 1);
-    if (chartPage === -1 || chartPage > maxPage) chartPage = maxPage;
+    if (chartPage === -1) {
+        chartPage = streakChartPageForLatestJourney(pages);
+    } else if (chartPage > maxPage) {
+        chartPage = maxPage;
+    }
     const page = pages[chartPage] || { points: [] };
     return {
         points: getAllStreakPoints(),
@@ -685,7 +719,7 @@ function renderBestPerformances() {
 function renderLifetimeStats() {
     // Journeys: completed + current (if current attempt not already archived).
     // Strong / Relapses: unique wall dates from dailyLog — never sum journey scores
-    // (that double-counted after a 10-slip finish while score was still live).
+    // (that double-counted after a 5-slip finish while score was still live).
     var journeys = typeof countLifetimeJourneys === 'function'
         ? countLifetimeJourneys()
         : Math.max(1, Number(state.attempt) || 1);

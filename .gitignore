@@ -16,11 +16,15 @@ android/**/build/
 android/app/build/
 android/build/
 
+# RevenueCat SDK keys (use constants-revenuecat.local.js from .example)
+constants-revenuecat.local.js
+
 # Local review bundles (regenerate: npm run review:zip)
 *-code-review*.zip
 King-*.zip
 
 # Android local / IDE
+.idea/
 android/captures/
 android/local.properties
 android/*.iml

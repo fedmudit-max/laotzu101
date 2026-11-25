@@ -8,9 +8,11 @@
     "cap:sync": "npm run web:copy && npx cap sync",
     "cap:android": "npm run cap:sync && npx cap open android",
     "cap:ios": "npm run cap:sync && npx cap open ios",
-    "android:debug": "npm run web:copy && cd android && ./gradlew :app:assembleDebug",
+    "android:debug": "npm run web:copy && cd android && ../scripts/with-gradle-java.sh ./gradlew :app:assembleDebug",
     "android:install": "npm run android:debug && node scripts/install-debug-apk.js",
-    "android:bundle": "npm run web:copy && cd android && ./gradlew :app:bundleRelease",
+    "release:preflight": "node scripts/release-preflight.js",
+    "billing:logcat": "adb logcat -c; adb logcat | rg -i 'RevenueCat|Purchases|billing:revenuecat|Capacitor/Console'",
+    "android:bundle": "cd android && ../scripts/with-gradle-java.sh ./gradlew :app:bundleRelease",
     "icons:generate": "python3 scripts/generate-icons.py",
     "test": "node --test --test-concurrency=1 tests/*.test.js",
     "review:zip": "bash scripts/make-review-zip.sh"

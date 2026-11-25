@@ -225,9 +225,9 @@ test('journey ranking uses score.success like progress graph', () => {
     ctx.replaceState(ctx.mergeSavedState({
         ...ctx.getDefaultState(),
         completedJourneys: [
-            { attempt: 1, score: { success: 41, failures: 10 } },
-            { attempt: 2, score: { success: 90, failures: 10 } },
-            { attempt: 3, score: { success: 62, failures: 8 } },
+            { attempt: 1, score: { success: 41, failures: 3 } },
+            { attempt: 2, score: { success: 90, failures: 3 } },
+            { attempt: 3, score: { success: 62, failures: 3 } },
         ],
         attempt: 4,
         pendingNextJourney: true,
@@ -243,8 +243,8 @@ test('active journey in rank 3 gets bronze active state', () => {
     ctx.replaceState(ctx.mergeSavedState({
         ...ctx.getDefaultState(),
         completedJourneys: [
-            { attempt: 1, score: { success: 90, failures: 10 } },
-            { attempt: 2, score: { success: 62, failures: 10 } },
+            { attempt: 1, score: { success: 90, failures: 3 } },
+            { attempt: 2, score: { success: 62, failures: 3 } },
         ],
         attempt: 3,
         score: { success: 41, failures: 2 },
@@ -262,9 +262,9 @@ test('active journey at rank 4 gets active highlight on green row', () => {
     ctx.replaceState(ctx.mergeSavedState({
         ...ctx.getDefaultState(),
         completedJourneys: [
-            { attempt: 1, score: { success: 90, failures: 10 } },
-            { attempt: 2, score: { success: 62, failures: 10 } },
-            { attempt: 3, score: { success: 41, failures: 10 } },
+            { attempt: 1, score: { success: 90, failures: 3 } },
+            { attempt: 2, score: { success: 62, failures: 3 } },
+            { attempt: 3, score: { success: 41, failures: 3 } },
         ],
         attempt: 4,
         score: { success: 8, failures: 1 },
@@ -282,11 +282,11 @@ test('active journey outside top 5 has no glow', () => {
     ctx.replaceState(ctx.mergeSavedState({
         ...ctx.getDefaultState(),
         completedJourneys: [
-            { attempt: 1, score: { success: 90, failures: 10 } },
-            { attempt: 2, score: { success: 80, failures: 10 } },
-            { attempt: 3, score: { success: 70, failures: 10 } },
-            { attempt: 4, score: { success: 60, failures: 10 } },
-            { attempt: 5, score: { success: 50, failures: 10 } },
+            { attempt: 1, score: { success: 90, failures: 3 } },
+            { attempt: 2, score: { success: 80, failures: 3 } },
+            { attempt: 3, score: { success: 70, failures: 3 } },
+            { attempt: 4, score: { success: 60, failures: 3 } },
+            { attempt: 5, score: { success: 50, failures: 3 } },
         ],
         attempt: 6,
         score: { success: 8, failures: 1 },
@@ -303,15 +303,15 @@ test('journey tie on strong days ranks fewer slips higher', () => {
     ctx.replaceState(ctx.mergeSavedState({
         ...ctx.getDefaultState(),
         completedJourneys: [
-            { attempt: 1, score: { success: 50, failures: 10 } },
-            { attempt: 2, score: { success: 50, failures: 5 } },
-            { attempt: 3, score: { success: 50, failures: 8 } },
+            { attempt: 1, score: { success: 50, failures: 3 } },
+            { attempt: 2, score: { success: 50, failures: 1 } },
+            { attempt: 3, score: { success: 50, failures: 2 } },
         ],
         pendingNextJourney: true,
     }));
     const board = ctx.buildBestJourneysBoard(getState(ctx));
     assertSlotValues(board.slots, [50, 50, 50]);
-    // Same strong days: rank by fewer slips (5 → 8 → 10).
+    // Same strong days: rank by fewer slips (1 → 2 → 3).
     assert.equal(board.slots[0].rank, 1);
     assert.equal(board.slots[0].id, 'journey:2:completed');
     assert.equal(board.slots[1].rank, 2);

@@ -78,7 +78,7 @@ function showCelebration(data, opts = {}) {
 }
 
 function buildSlipLoggedCelebration(failures) {
-    var max = typeof MAX_FAILURES === 'number' ? MAX_FAILURES : 10;
+    var max = typeof MAX_FAILURES === 'number' ? MAX_FAILURES : 5;
     var count = Math.max(0, Number(failures) || 0);
     var left = Math.max(0, max - count);
     return {

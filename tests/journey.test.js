@@ -49,16 +49,16 @@ test('second slip on same day is blocked', () => {
     assert.equal(getState(ctx).score.failures, 1);
 });
 
-test('ten slip days ends journey and blocks further logging', () => {
+test('five slip days ends journey and blocks further logging', () => {
     const ctx = createKingContext();
     const start = '2026-06-15';
-    const end = ctx.addDaysToKey(start, 9);
+    const end = ctx.addDaysToKey(start, 4);
     resetKing(ctx, { today: end });
     seedJourney(ctx, { today: end, start });
 
-    slipOnConsecutiveDays(ctx, start, 10);
+    slipOnConsecutiveDays(ctx, start, 5);
     const s = getState(ctx);
-    assert.equal(s.score.failures, 10);
+    assert.equal(s.score.failures, 5);
     assert.equal(ctx.journeyIsOver(s), true);
     assert.equal(ctx.canLogToday(), false);
 
@@ -75,10 +75,10 @@ test('next journey target after first journey with 12 strong days', () => {
         journeyEndedDate: '2026-06-15',
         completedJourneys: [{
             attempt: 1,
-            score: { success: 12, failures: 10 },
+            score: { success: 12, failures: 3 },
             date: '2026-06-15T00:00:00.000Z',
         }],
-        bestJourney: { success: 12, failures: 10 },
+        bestJourney: { success: 12, failures: 3 },
     });
 
     assert.equal(ctx.getNextJourneyTargetGoal(), 'Beat 12 Strong Days to Win');
@@ -93,10 +93,10 @@ test('next journey target after first journey with 26 strong days', () => {
         journeyEndedDate: '2026-06-15',
         completedJourneys: [{
             attempt: 1,
-            score: { success: 26, failures: 10 },
+            score: { success: 26, failures: 3 },
             date: '2026-06-15T00:00:00.000Z',
         }],
-        bestJourney: { success: 26, failures: 10 },
+        bestJourney: { success: 26, failures: 3 },
     });
 
     assert.equal(ctx.getNextJourneyTargetGoal(), 'Beat 26 Strong Days to Win');
@@ -109,20 +109,20 @@ test('next journey target keeps all-time best when latest journey scores lower',
     setState(ctx, {
         pendingNextJourney: true,
         journeyEndedDate: '2026-06-20',
-        score: { success: 20, failures: 10 },
+        score: { success: 20, failures: 3 },
         completedJourneys: [
             {
                 attempt: 1,
-                score: { success: 26, failures: 10 },
+                score: { success: 26, failures: 3 },
                 date: '2026-06-10T00:00:00.000Z',
             },
             {
                 attempt: 2,
-                score: { success: 20, failures: 10 },
+                score: { success: 20, failures: 3 },
                 date: '2026-06-20T00:00:00.000Z',
             },
         ],
-        bestJourney: { success: 26, failures: 10 },
+        bestJourney: { success: 26, failures: 3 },
     });
 
     assert.equal(ctx.getNextJourneyTargetGoal(), 'Beat 26 Strong Days to Win');
@@ -135,20 +135,20 @@ test('next journey target uses new best when latest journey beats prior best', (
     setState(ctx, {
         pendingNextJourney: true,
         journeyEndedDate: '2026-06-20',
-        score: { success: 30, failures: 10 },
+        score: { success: 30, failures: 3 },
         completedJourneys: [
             {
                 attempt: 1,
-                score: { success: 26, failures: 10 },
+                score: { success: 26, failures: 3 },
                 date: '2026-06-10T00:00:00.000Z',
             },
             {
                 attempt: 2,
-                score: { success: 30, failures: 10 },
+                score: { success: 30, failures: 3 },
                 date: '2026-06-20T00:00:00.000Z',
             },
         ],
-        bestJourney: { success: 30, failures: 10 },
+        bestJourney: { success: 30, failures: 3 },
     });
 
     assert.equal(ctx.getNextJourneyTargetGoal(), 'Beat 30 Strong Days to Win');
@@ -163,10 +163,10 @@ test('next journey target after first journey with no strong days', () => {
         journeyEndedDate: '2026-06-15',
         completedJourneys: [{
             attempt: 1,
-            score: { success: 0, failures: 10 },
+            score: { success: 0, failures: 3 },
             date: '2026-06-15T00:00:00.000Z',
         }],
-        bestJourney: { success: 0, failures: 10 },
+        bestJourney: { success: 0, failures: 3 },
     });
 
     assert.equal(ctx.getNextJourneyTargetGoal(), 'Target 25 strong days');
@@ -175,16 +175,16 @@ test('next journey target after first journey with no strong days', () => {
 test('first journey archive has no prior best but still returns comparison', () => {
     const ctx = createKingContext();
     const start = '2026-06-15';
-    const end = ctx.addDaysToKey(start, 9);
+    const end = ctx.addDaysToKey(start, 4);
     resetKing(ctx, { today: end });
     seedJourney(ctx, { today: end, start });
 
-    slipOnConsecutiveDays(ctx, start, 10);
+    slipOnConsecutiveDays(ctx, start, 5);
     const comparison = ctx.archiveCompletedJourney(end);
     assert.ok(comparison);
     assert.equal(comparison.prevBestScore, null);
     assert.equal(comparison.score.success, 0);
-    assert.equal(comparison.score.failures, 10);
+    assert.equal(comparison.score.failures, 5);
     assert.equal(comparison.attempt, 1);
 });
 
@@ -198,31 +198,31 @@ test('first journey with strong days does not treat mirrored bestJourney as prio
     for (let i = 0; i < 12; i++) {
         ctx.applyStrongDay({ logDate: ctx.addDaysToKey(start, i), suppressUI: true });
     }
-    slipOnConsecutiveDays(ctx, ctx.addDaysToKey(start, 12), 10);
+    slipOnConsecutiveDays(ctx, ctx.addDaysToKey(start, 12), 5);
 
     const comparison = ctx.archiveCompletedJourney(end);
     assert.ok(comparison);
     assert.equal(comparison.prevBestScore, null);
     assert.equal(comparison.score.success, 12);
     assert.equal(getState(ctx).bestJourney.success, 12);
-    assert.equal(getState(ctx).bestJourney.failures, 10);
+    assert.equal(getState(ctx).bestJourney.failures, 5);
 });
 
-test('archive after 10 slip days sets awaiting next journey', () => {
+test('archive after 5 slip days sets awaiting next journey', () => {
     const ctx = createKingContext();
     const start = '2026-06-15';
-    const end = ctx.addDaysToKey(start, 9);
+    const end = ctx.addDaysToKey(start, 4);
     resetKing(ctx, { today: end });
     seedJourney(ctx, { today: end, start });
 
-    slipOnConsecutiveDays(ctx, start, 10);
+    slipOnConsecutiveDays(ctx, start, 5);
     const comparison = ctx.archiveCompletedJourney(end);
     const s = getState(ctx);
     assert.ok(comparison);
     assert.equal(ctx.isAwaitingNextJourney(), true);
     assert.equal(s.journeyEndedDate, end);
     assert.equal(s.completedJourneys.length, 1);
-    assert.equal(s.completedJourneys[0].score.failures, 10);
+    assert.equal(s.completedJourneys[0].score.failures, 5);
     assert.equal(s.completedJourneys[0].score.success, 0);
 });
 
@@ -243,12 +243,12 @@ test('strong days accumulate until journey ends', () => {
 test('beginNextJourney after end day resets score and bumps attempt', () => {
     const ctx = createKingContext();
     const start = '2026-06-15';
-    const end = ctx.addDaysToKey(start, 9);
-    const nextDay = ctx.addDaysToKey(start, 10);
+    const end = ctx.addDaysToKey(start, 4);
+    const nextDay = ctx.addDaysToKey(start, 5);
     resetKing(ctx, { today: nextDay });
     seedJourney(ctx, { today: nextDay, start });
 
-    slipOnConsecutiveDays(ctx, start, 10);
+    slipOnConsecutiveDays(ctx, start, 5);
     ctx.archiveCompletedJourney(end);
 
     ctx.beginNextJourney();
@@ -265,19 +265,19 @@ test('permanent best journey updates when finished score beats prior', () => {
     const ctx = createKingContext();
     const start = '2026-06-15';
     const firstSlipDay = ctx.addDaysToKey(start, 5);
-    const lastSlipDay = ctx.addDaysToKey(start, 14);
+    const lastSlipDay = ctx.addDaysToKey(start, 9);
     resetKing(ctx, { today: lastSlipDay });
     seedJourney(ctx, { today: lastSlipDay, start });
 
     for (let i = 0; i < 5; i++) {
         ctx.applyStrongDay({ logDate: ctx.addDaysToKey(start, i), suppressUI: true });
     }
-    slipOnConsecutiveDays(ctx, firstSlipDay, 10);
+    slipOnConsecutiveDays(ctx, firstSlipDay, 5);
     ctx.archiveCompletedJourney(lastSlipDay);
 
     const best = getState(ctx).bestJourney;
     assert.equal(best.success, 5);
-    assert.equal(best.failures, 10);
+    assert.equal(best.failures, 5);
 });
 
 test('journey milestone labels use strong days wording', () => {
@@ -350,7 +350,7 @@ test('best journey hint shows beat prior best on later journeys', () => {
         score: { success: 10, failures: 0 },
         completedJourneys: [{
             attempt: 1,
-            score: { success: 38, failures: 10 },
+            score: { success: 38, failures: 3 },
             endedDate: '2026-06-14',
         }],
     });
@@ -372,7 +372,7 @@ test('best journey hint shows keep going when current journey beats prior', () =
         score: { success: 149, failures: 2 },
         completedJourneys: [{
             attempt: 1,
-            score: { success: 145, failures: 10 },
+            score: { success: 145, failures: 3 },
             endedDate: '2026-06-14',
         }],
     });
@@ -396,11 +396,11 @@ test('archive below-best uses permanent bestJourney when higher than completed r
     resetKing(ctx, { today: end });
     seedJourney(ctx, { today: end, start, attempt: 2 });
     setState(ctx, {
-        score: { success: 12, failures: 10 },
-        bestJourney: { success: 40, failures: 10 },
+        score: { success: 12, failures: 5 },
+        bestJourney: { success: 40, failures: 5 },
         completedJourneys: [{
             attempt: 1,
-            score: { success: 38, failures: 10 },
+            score: { success: 38, failures: 5 },
             date: '2026-06-14T00:00:00.000Z',
         }],
     });
@@ -425,11 +425,11 @@ test('archive exposes prior best when second journey ends below first', () => {
     resetKing(ctx, { today: end });
     seedJourney(ctx, { today: end, start, attempt: 2 });
     setState(ctx, {
-        score: { success: 12, failures: 10 },
-        bestJourney: { success: 38, failures: 10 },
+        score: { success: 12, failures: 3 },
+        bestJourney: { success: 38, failures: 3 },
         completedJourneys: [{
             attempt: 1,
-            score: { success: 38, failures: 10 },
+            score: { success: 38, failures: 3 },
             date: '2026-06-14T00:00:00.000Z',
         }],
     });
@@ -437,7 +437,7 @@ test('archive exposes prior best when second journey ends below first', () => {
     const comparison = ctx.archiveCompletedJourney(end);
     assert.ok(comparison);
     assert.equal(comparison.prevBestScore.success, 38);
-    assert.equal(comparison.prevBestScore.failures, 10);
+    assert.equal(comparison.prevBestScore.failures, 3);
     assert.equal(comparison.prevBestAttempt, 1);
     assert.equal(
         ctx.isBetterJourneyScore(
@@ -456,8 +456,8 @@ test('archive falls back to bestJourney when completed history is missing', () =
     resetKing(ctx, { today: end });
     seedJourney(ctx, { today: end, start, attempt: 2 });
     setState(ctx, {
-        score: { success: 5, failures: 10 },
-        bestJourney: { success: 20, failures: 10 },
+        score: { success: 5, failures: 5 },
+        bestJourney: { success: 20, failures: 5 },
         completedJourneys: [],
     });
 
@@ -467,25 +467,25 @@ test('archive falls back to bestJourney when completed history is missing', () =
     assert.equal(comparison.prevBestAttempt, 1);
 });
 
-test('second journey archive keeps prior best after 10th slip', () => {
+test('second journey archive keeps prior best after 5th slip', () => {
     const ctx = createKingContext();
     const start = '2026-06-15';
-    const end = ctx.addDaysToKey(start, 24);
+    const end = ctx.addDaysToKey(start, 19);
     resetKing(ctx, { today: end });
     seedJourney(ctx, { today: end, start, attempt: 2 });
     setState(ctx, {
         completedJourneys: [{
             attempt: 1,
-            score: { success: 12, failures: 10 },
+            score: { success: 12, failures: 3 },
             date: '2026-06-14T00:00:00.000Z',
         }],
-        bestJourney: { success: 12, failures: 10 },
+        bestJourney: { success: 12, failures: 3 },
     });
 
     for (let i = 0; i < 15; i++) {
         ctx.applyStrongDay({ logDate: ctx.addDaysToKey(start, i), suppressUI: true });
     }
-    slipOnConsecutiveDays(ctx, ctx.addDaysToKey(start, 15), 10);
+    slipOnConsecutiveDays(ctx, ctx.addDaysToKey(start, 15), 5);
 
     assert.equal(getState(ctx).bestJourney.success, 12);
     const comparison = ctx.archiveCompletedJourney(end);
@@ -510,10 +510,10 @@ test('buildComparisonForAwaitingJourney rebuilds journey 2 comparison on reopen'
         pendingNextJourney: true,
         journeyEndedDate: '2026-06-19',
         completedJourneys: [
-            { attempt: 1, score: { success: 12, failures: 10 } },
-            { attempt: 2, score: { success: 7, failures: 10 } },
+            { attempt: 1, score: { success: 12, failures: 3 } },
+            { attempt: 2, score: { success: 7, failures: 3 } },
         ],
-        score: { success: 7, failures: 10 },
+        score: { success: 7, failures: 3 },
     });
 
     const comparison = ctx.buildComparisonForAwaitingJourney();
@@ -529,8 +529,8 @@ test('wasJourneyComparisonShown keys by archived attempt and end date', () => {
 
     const comparison = {
         attempt: 2,
-        score: { success: 15, failures: 10 },
-        prevBestScore: { success: 12, failures: 10 },
+        score: { success: 15, failures: 3 },
+        prevBestScore: { success: 12, failures: 3 },
         journeyEndedDate: '2026-06-19',
     };
 
@@ -549,11 +549,11 @@ test('healStrandedJourneyEnd returns comparison when it archives a stranded fini
     resetKing(ctx, { today: end });
     seedJourney(ctx, { today: end, start, attempt: 2 });
     setState(ctx, {
-        score: { success: 8, failures: 10 },
-        bestJourney: { success: 25, failures: 10 },
+        score: { success: 8, failures: 5 },
+        bestJourney: { success: 25, failures: 3 },
         completedJourneys: [{
             attempt: 1,
-            score: { success: 25, failures: 10 },
+            score: { success: 25, failures: 3 },
             date: '2026-06-14T00:00:00.000Z',
         }],
     });

@@ -2,6 +2,132 @@
  * backup.js — Export / import progress JSON.
  */
 
+function isStoreEntitlementSource(src) {
+    return src === 'play' || src === 'restore' || src === 'revenuecat';
+}
+
+/** Backup JSON is user-controlled — never treat billing fields as proof of purchase. */
+function stripUntrustedBackupBillingFields(s) {
+    if (!s || typeof s !== 'object') return s;
+    s.premiumUntil = '';
+    s.lastVerifiedAt = '';
+    s.source = '';
+    return s;
+}
+
+function snapshotDeviceEntitlement(s) {
+    s = s || (typeof state !== 'undefined' ? state : null);
+    if (!s || typeof Entitlement === 'undefined') return null;
+    if (!isStoreEntitlementSource(s.source)) return null;
+    if (!Entitlement.isSubscriptionActive(s)) return null;
+    return {
+        premiumUntil: s.premiumUntil,
+        source: s.source,
+        lastVerifiedAt: s.lastVerifiedAt || '',
+    };
+}
+
+function reconcileEntitlementAfterImport(deviceEnt) {
+    if (!deviceEnt || typeof updateEntitlementSnapshot !== 'function') return;
+    var until = new Date(deviceEnt.premiumUntil);
+    if (Number.isNaN(until.getTime()) || until.getTime() <= Date.now()) return;
+    updateEntitlementSnapshot({
+        premiumUntil: deviceEnt.premiumUntil,
+        lastVerifiedAt: deviceEnt.lastVerifiedAt,
+        source: deviceEnt.source,
+    });
+}
+
+function isValidWallDate(key) {
+    return typeof key === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(key);
+}
+
+function isPastOrPresentWallDate(key) {
+    if (!isValidWallDate(key)) return false;
+    if (typeof todayKey !== 'function') return true;
+    return key <= todayKey();
+}
+
+function earliestWallDate(a, b) {
+    if (!isPastOrPresentWallDate(a)) return isPastOrPresentWallDate(b) ? b : '';
+    if (!isPastOrPresentWallDate(b)) return a;
+    return a < b ? a : b;
+}
+
+function deviceHasEstablishedProgress(s) {
+    if (!s) return false;
+    if ((Number(s.attempt) || 0) > 1) return true;
+    var log = s.dailyLog || {};
+    return Object.keys(log).length > 0;
+}
+
+function trialProbeState(base, appStartDate, trialStartedAt) {
+    var probe = Object.assign({}, base || {});
+    if (appStartDate) probe.appStartDate = appStartDate;
+    if (trialStartedAt) probe.trialStartedAt = trialStartedAt;
+    return probe;
+}
+
+/**
+ * Trial anchors on import: earliest valid install day, never extend an active trial,
+ * never restart an expired trial on this device.
+ */
+function applyTrialAnchorPolicyForImport(imported, deviceBefore) {
+    imported = imported || {};
+    deviceBefore = deviceBefore || {};
+    var out = Object.assign({}, imported);
+
+    var deviceApp = isPastOrPresentWallDate(deviceBefore.appStartDate) ? deviceBefore.appStartDate : '';
+    var importApp = isPastOrPresentWallDate(out.appStartDate) ? out.appStartDate : '';
+    var fromLog = typeof inferAppStartFromLog === 'function' ? inferAppStartFromLog(out) : '';
+    importApp = earliestWallDate(importApp, isPastOrPresentWallDate(fromLog) ? fromLog : '');
+
+    var deviceTrialExpired = false;
+    if (deviceBefore.trialStartedAt && typeof Entitlement !== 'undefined') {
+        var devProbe = trialProbeState(deviceBefore, deviceApp, deviceBefore.trialStartedAt);
+        deviceTrialExpired = !Entitlement.isTrialActive(devProbe);
+    }
+
+    var chosenApp = '';
+    if (deviceHasEstablishedProgress(deviceBefore) || deviceApp || deviceBefore.trialStartedAt) {
+        chosenApp = earliestWallDate(deviceApp, importApp);
+        if (deviceTrialExpired) {
+            chosenApp = deviceApp || chosenApp;
+            if (deviceBefore.trialStartedAt) out.trialStartedAt = deviceBefore.trialStartedAt;
+        }
+    } else {
+        chosenApp = importApp;
+    }
+
+    if (chosenApp) out.appStartDate = chosenApp;
+    else if (!isPastOrPresentWallDate(out.appStartDate)) out.appStartDate = '';
+
+    if (out.trialStartedAt) {
+        var trialStart = new Date(out.trialStartedAt);
+        if (Number.isNaN(trialStart.getTime()) || trialStart.getTime() > Date.now()) {
+            out.trialStartedAt = deviceTrialExpired ? (deviceBefore.trialStartedAt || '') : '';
+        }
+    }
+    if (deviceTrialExpired && deviceBefore.trialStartedAt) {
+        out.trialStartedAt = deviceBefore.trialStartedAt;
+    }
+    if (chosenApp && !out.trialStartedAt && typeof trialStartIsoForCalendarDayOne === 'function') {
+        out.trialStartedAt = trialStartIsoForCalendarDayOne(trialProbeState(out, chosenApp, ''));
+    }
+
+    return out;
+}
+
+function applyBackupImportState(deviceSnap, importedState) {
+    var prepared = Object.assign({}, importedState || {});
+    stripUntrustedBackupBillingFields(prepared);
+    prepared = applyTrialAnchorPolicyForImport(prepared, deviceSnap || {});
+    var deviceEnt = snapshotDeviceEntitlement(deviceSnap);
+    replaceState(mergeSavedState(prepared));
+    reconcileEntitlementAfterImport(deviceEnt);
+    return deviceEnt;
+}
+
 /** Snapshot of app state for export to a JSON file on the user's device. */
 function buildBackupPayload() {
     syncJourneyMilestoneCountsFromHistory(state);
@@ -46,9 +172,12 @@ function parseBackupJson(text) {
         return { ok: false, error: 'not-king-backup' };
     }
 
+    var savedForMerge = Object.assign({}, saved);
+    stripUntrustedBackupBillingFields(savedForMerge);
+
     return {
         ok: true,
-        state: mergeSavedState(saved),
+        state: mergeSavedState(savedForMerge),
         exportedAt,
         onboardingComplete,
     };
@@ -323,7 +452,8 @@ function restoreImportBackup(backup) {
         showToast(0, 'Nothing to restore.');
         return;
     }
-    replaceState(mergeSavedState(backup.state));
+    var deviceSnap = JSON.parse(JSON.stringify(state));
+    applyBackupImportState(deviceSnap, backup.state);
     if (typeof healStrandedJourneyEnd === 'function') healStrandedJourneyEnd();
     if (typeof recomputeCurrentStreak === 'function') recomputeCurrentStreak();
     if (backup.onboardingComplete === true) {
@@ -339,6 +469,9 @@ function restoreImportBackup(backup) {
     switchChartMode('streaks');
     if (backup.exportedAt) recordLastBackupAt(backup.exportedAt);
     saveToStorage(state);
+    if (typeof isSubscriptionCommerceUiEnabled === 'function' && isSubscriptionCommerceUiEnabled()) {
+        if (typeof refreshStorePurchasesSilent === 'function') refreshStorePurchasesSilent();
+    }
     if (Entitlement.hasPremiumAccess()) {
         unlockPremiumFeatures();
     } else {

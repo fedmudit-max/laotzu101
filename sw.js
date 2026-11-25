@@ -22,7 +22,7 @@ const ASSETS = [
     './logic-best-performances.js',
     './entitlement.js',
     './billing-offers.js',
-    './billing-store-play.js',
+    './billing-entitlement-snapshot.js',
     './billing-ui.js',
     './firebase.js',
     './backup.js',

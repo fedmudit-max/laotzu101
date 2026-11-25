@@ -151,6 +151,15 @@ function showFileProtocolBanner() {
         if (btn === lastActionTap.btn && action === lastActionTap.action && now - lastActionTap.at < 600) return;
         lastActionTap = { btn: btn, action: action, at: now };
 
+        if (
+            action === 'open-premium'
+            || action === 'premium-checkout'
+            || action === 'premium-restore'
+            || action.indexOf('premium-plan-') === 0
+        ) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
         if (handlePremiumAction(action)) return;
 
         var actions = {
@@ -234,6 +243,15 @@ function showFileProtocolBanner() {
         });
     }
 
+    var premiumOverlay = document.getElementById('premiumOverlay');
+    if (premiumOverlay) {
+        premiumOverlay.addEventListener('click', function (e) {
+            if (e.target.id === 'premiumOverlay' && typeof closePremiumSheet === 'function') {
+                closePremiumSheet();
+            }
+        });
+    }
+
     var privacyOverlay = document.getElementById('privacyOverlay');
     if (privacyOverlay) {
         privacyOverlay.addEventListener('click', function (e) {
@@ -288,7 +306,7 @@ function showFileProtocolBanner() {
         try { initFirebase(); } catch (err) { console.error('King firebase init failed:', err); }
         try { init(); } catch (err) { console.error('King init failed:', err); }
         try { initReminders(); } catch (err) { console.error('King reminder init failed:', err); }
-        initPremiumStartup();
+        try { initPremiumStartup(); } catch (err) { console.error('King premium init failed:', err); }
         dismissLoadScreen(function () {
             try { paintApp(true); } catch (err) { console.error('King render failed:', err); }
             try { checkOnboarding(); } catch (err) { console.error('King onboarding failed:', err); }
@@ -302,6 +320,7 @@ function showFileProtocolBanner() {
 
     showFileProtocolBanner();
     startApp();
+    setTimeout(hideLoadScreenNow, 2500);
 
     document.addEventListener('visibilitychange', function () {
         if (document.visibilityState === 'visible') {

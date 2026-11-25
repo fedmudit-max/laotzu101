@@ -53,6 +53,13 @@ function copyFileInto(destRoot, rel) {
     const from = path.join(ROOT, rel);
     const to = path.join(destRoot, rel);
     if (!fs.existsSync(from)) {
+        if (rel === 'constants-revenuecat.local.js') {
+            throw new Error(
+                'Missing constants-revenuecat.local.js (gitignored).\n'
+                + 'Copy constants-revenuecat.local.example.js to that name and set the King Android public SDK key (goog_…) from the RevenueCat dashboard.\n'
+                + 'Do not commit the local file.',
+            );
+        }
         throw new Error('Missing web file: ' + rel);
     }
     fs.mkdirSync(path.dirname(to), { recursive: true });

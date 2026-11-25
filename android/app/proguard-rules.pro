@@ -3,7 +3,7 @@
 # release.minifyEnabled is false today (see app/build.gradle).
 # BEFORE turning minify on: keep rules must stay in sync with native plugins,
 # then smoke-test a release APK on a real device:
-#   - KingBilling (queryProducts, queryPurchases)
+#   - Legacy KingBilling Java (unregistered; RevenueCat is the purchase path)
 #   - KingReminder (schedule, notification tap → log)
 #
 # See ARCHITECTURE.md → Android release builds.

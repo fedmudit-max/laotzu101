@@ -65,7 +65,7 @@ function createKingContext() {
         'entitlement.js',
         'backup.js',
         'billing-offers.js',
-        'billing-store-play.js',
+        'billing-entitlement-snapshot.js',
         'billing-store-revenuecat.js',
         'billing-platform.js',
         'billing-ui.js',
@@ -156,7 +156,8 @@ function runRestorePipeline(ctx, saved) {
  */
 function simulateRestoreImportBackup(ctx, backup) {
     if (!backup || !backup.state) return false;
-    ctx.replaceState(ctx.mergeSavedState(backup.state));
+    var deviceSnap = JSON.parse(JSON.stringify(getState(ctx)));
+    ctx.applyBackupImportState(deviceSnap, backup.state);
     ctx.healStrandedJourneyEnd();
     ctx.recomputeCurrentStreak();
     if (backup.onboardingComplete === true) {

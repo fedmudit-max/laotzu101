@@ -111,19 +111,27 @@ body::before {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    width: var(--app-top-bar-row);
+    gap: 4px;
     height: var(--app-top-bar-row);
+    max-height: var(--app-top-bar-row);
     margin: 0;
-    margin-right: -10px;
+    margin-right: -6px;
     padding: 0;
     border: none;
-    border-radius: 50%;
+    border-radius: 8px;
     background: transparent;
     color: rgba(60, 60, 67, 0.75);
     cursor: pointer;
     -webkit-appearance: none;
     appearance: none;
     transition: color 0.15s ease, transform 0.12s ease;
+}
+
+.app-top-bar-settings-label {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 20px;
+    letter-spacing: -0.2px;
 }
 
 .app-top-bar-settings-icon {
@@ -1521,7 +1529,7 @@ body::before {
 }
 .score-value.relapse-9 .score-failures { color: #7b2d26; }
 
-/* 10th slip — journey over, neutral grey */
+/* Last slip — journey over, neutral grey */
 .score-value.relapse-10 .score-sep {
     background-image: linear-gradient(90deg, var(--green), var(--text-muted));
 }
@@ -1600,29 +1608,29 @@ body::before {
     background: rgba(52, 199, 89, 0.16);
 }
 
-/* ── SLIPS (10 🛡️ shields) ─────────────────────── */
+/* ── SLIPS (5 🛡️ shields) ─────────────────────── */
 .chances-card {
     background: rgba(52, 199, 89, 0.12);
     border: 1.5px solid rgba(52, 199, 89, 0.3);
     border-radius: 12px;
-    padding: 10px 12px;
+    padding: 12px 12px 10px;
     margin-bottom: 10px;
 }
 
 .chances-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 4px;
+    gap: 8px;
     margin-bottom: 8px;
 }
 
 .chance {
-    font-size: 24px;
+    font-size: 40px;
     line-height: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 28px;
+    min-height: 48px;
 }
 
 /* Noto Color Emoji draws larger than Apple at the same font-size — balance on Android only */
@@ -1631,12 +1639,12 @@ body.platform-android .chances-card {
 }
 
 body.platform-android .chances-grid {
-    gap: 5px 4px;
+    gap: 8px;
 }
 
 body.platform-android .chance {
-    font-size: 21px;
-    min-height: 26px;
+    font-size: 36px;
+    min-height: 44px;
 }
 
 /* Used chances go grey */
@@ -4910,34 +4918,6 @@ button {
     margin: 0;
 }
 
-.premium-panel-features {
-    list-style: none;
-    margin: 0 0 14px;
-    padding: 0;
-    text-align: left;
-}
-
-.premium-panel-features li {
-    position: relative;
-    padding: 8px 0 8px 18px;
-    font-size: 13px;
-    line-height: 1.4;
-    color: var(--text);
-    border-bottom: 1px solid var(--border);
-}
-
-.premium-panel-features li:last-child {
-    border-bottom: none;
-}
-
-.premium-panel-features li::before {
-    content: '✓';
-    position: absolute;
-    left: 0;
-    color: var(--green);
-    font-weight: 700;
-}
-
 .btn-premium-panel {
     width: 100%;
     padding: 14px 16px;
@@ -4951,10 +4931,19 @@ button {
     color: #fff;
 }
 
+/* Above settings sheet (2000) so paywall is visible after Subscribe from Settings */
+.premium-overlay {
+    z-index: 4000;
+}
+
 .premium-overlay .premium-card {
     max-width: 360px;
     text-align: center;
     padding: 28px 22px 22px;
+}
+
+.btn-premium-buy.is-blocked {
+    opacity: 0.55;
 }
 
 .premium-badge {
@@ -4982,27 +4971,6 @@ button {
     line-height: 1.5;
     color: var(--text-muted);
     margin-bottom: 18px;
-}
-
-.premium-backup-note {
-    margin: 0 0 16px;
-    padding: 10px 12px;
-    text-align: left;
-    font-size: 12px;
-    font-weight: 500;
-    line-height: 1.45;
-    color: var(--text-muted);
-    background: rgba(60, 60, 67, 0.06);
-    border-radius: 10px;
-}
-
-.premium-backup-note[hidden] {
-    display: none;
-}
-
-.premium-panel-features + .premium-backup-note {
-    margin-top: 4px;
-    margin-bottom: 14px;
 }
 
 .premium-plans {
@@ -5083,6 +5051,20 @@ button {
 }
 .premium-price-note:empty {
     display: none;
+}
+
+.premium-rc-setup-steps {
+    margin-top: 10px;
+    font-size: 12px;
+    line-height: 1.45;
+    text-align: left;
+    white-space: pre-line;
+}
+
+.premium-billing-diag {
+    margin-top: 8px;
+    font-size: 12px;
+    opacity: 0.9;
 }
 
 .premium-price-unavailable {

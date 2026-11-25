@@ -236,7 +236,7 @@ function recordFailure() {
             showToast(0, 'You already slipped today. Stay strong tomorrow!');
             return;
         }
-        // Stranded 10/10 (logging blocked, never archived) — recover via normal end path.
+        // Stranded 5/5 (logging blocked, never archived) — recover via normal end path.
         if (typeof journeyIsOver === 'function' && journeyIsOver(state)
             && typeof isAwaitingNextJourney === 'function' && !isAwaitingNextJourney()) {
             var endDay = typeof inferJourneyEndWallDate === 'function'

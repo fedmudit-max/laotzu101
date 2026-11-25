@@ -19,8 +19,8 @@
  * @property {string} [appStartDate]    YYYY-MM-DD install Day 1. Trial runs PREMIUM_TRIAL_DAYS wall days
  *                                      from here (not per-journey Day counter).
  * @property {string} [premiumUntil]    ISO-8601; '' if unset.
- *                                      Sprint 3A: local access-cache expiry after last Play
- *                                      client confirmation (PREMIUM_PLAY_CACHE_DAYS).
+ *                                      Sprint 3A: local access-cache expiry after last paid
+ *                                      client confirmation (RevenueCat restore / purchase).
  *                                      Not Google’s subscription end date.
  * @property {string} [lastVerifiedAt]  ISO-8601. Sprint 3A: last Play *client* confirmation.
  *                                      Production: last Firebase / Play Developer API verify.

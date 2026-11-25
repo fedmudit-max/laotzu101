@@ -39,8 +39,26 @@ tasks.register('syncKingWebAssets', Exec) {
     outputs.dir("${kingProjectRoot}/android/app/src/main/assets/public")
 }
 
+tasks.register('kingReleasePreflight', Exec) {
+    group = 'king'
+    description = 'Validate RevenueCat configuration for release builds (Node release-preflight.js)'
+    dependsOn 'syncKingWebAssets'
+    workingDir kingProjectRoot
+    commandLine resolveKingNode(), 'scripts/release-preflight.js'
+    environment 'PLAY_PREVIOUS_VERSION_CODE', System.getenv('PLAY_PREVIOUS_VERSION_CODE') ?: ''
+    // Always re-run: do not skip via UP-TO-DATE / build cache after a prior successful release.
+    outputs.upToDateWhen { false }
+    outputs.cacheIf { false }
+}
+
 afterEvaluate {
     tasks.named('preBuild').configure { dependsOn 'syncKingWebAssets' }
+
+    tasks.matching { Task task ->
+        task.name == 'bundleRelease' || task.name == 'assembleRelease'
+    }.configureEach {
+        dependsOn tasks.named('kingReleasePreflight')
+    }
 }
 
 def keystorePropertiesFile = rootProject.file('keystore.properties')
@@ -56,7 +74,7 @@ android {
         applicationId "com.kingtracker.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 9
+        versionCode 20
         versionName "1.0.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
@@ -81,7 +99,7 @@ android {
             // BEFORE minifyEnabled true:
             //   1. Confirm android/app/proguard-rules.pro has keep rules (Capacitor, King plugins, billing)
             //   2. ./gradlew :app:assembleRelease && install release APK on a real device
-            //   3. Smoke-test KingBilling + KingReminder (see ARCHITECTURE.md → Android release builds)
+            //   3. Smoke-test RevenueCat billing + KingReminder (see ARCHITECTURE.md → Android release builds)
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             if (keystorePropertiesFile.exists()) {

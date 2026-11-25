@@ -1,6 +1,10 @@
 /**
  * Install the debug APK on the first attached emulator/device and launch King.
  * Prefer ANDROID_SERIAL when more than one device is listed.
+ *
+ * Play Internal/Closed builds are signed with your upload key; debug APK uses the
+ * debug keystore. Android rejects install -r over mismatched signatures — we uninstall
+ * the Play build once, then install debug (local data in app storage is removed).
  */
 const { execFileSync } = require('child_process');
 const fs = require('fs');
@@ -31,6 +35,21 @@ function listDevices() {
         .map(function (line) { return line.split('\t')[0]; });
 }
 
+function installApk(serial) {
+    try {
+        adb(['-s', serial, 'install', '-r', APK], { stdio: 'pipe' });
+        return { ok: true };
+    } catch (err) {
+        const combined = [
+            err.message,
+            err.stderr,
+            err.stdout,
+        ].filter(Boolean).join('\n');
+        const sigMismatch = /INSTALL_FAILED_UPDATE_INCOMPATIBLE|signatures do not match/i.test(combined);
+        return { ok: false, sigMismatch: sigMismatch, detail: combined };
+    }
+}
+
 if (!fs.existsSync(APK)) {
     console.error('No debug APK. Run: npm run android:debug');
     process.exit(1);
@@ -50,6 +69,21 @@ if (!serial || devices.indexOf(serial) === -1) {
 }
 
 console.log('Installing King on ' + serial);
-adb(['-s', serial, 'install', '-r', APK], { stdio: 'inherit' });
+let result = installApk(serial);
+if (!result.ok && result.sigMismatch) {
+    console.warn(
+        '\nPlay/test-track King uses a different signing key than this debug APK.\n' +
+        'Uninstalling ' + PKG + ' (app data on the phone for King will be removed).\n' +
+        'Export a backup from Settings first if you need your log.\n'
+    );
+    adb(['-s', serial, 'uninstall', PKG], { stdio: 'inherit' });
+    result = installApk(serial);
+}
+
+if (!result.ok) {
+    console.error(result.detail || 'adb install failed');
+    process.exit(1);
+}
+
 adb(['-s', serial, 'shell', 'am', 'force-stop', PKG], { stdio: 'inherit' });
 adb(['-s', serial, 'shell', 'am', 'start', '-n', ACTIVITY], { stdio: 'inherit' });

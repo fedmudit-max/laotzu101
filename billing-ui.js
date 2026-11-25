@@ -6,7 +6,7 @@
  *   Paywall wrong / stale → openPremiumSheet(), renderPremiumPlans()
  *   Sections locked after trial → applyPremiumTierLayout()
  *
- * Reads getPremiumOffer(); checkout/restore call billing-store-play.
+ * Reads getPremiumOffer(); checkout/restore call billing-platform (RC or Play).
  */
 
 let selectedPremiumPlanId = 'annual';
@@ -21,6 +21,7 @@ function isSubscriptionCommerceUiEnabled() {
 }
 
 function refreshPremiumOfferUiIfVisible() {
+    if (typeof document === 'undefined') return;
     var overlay = document.getElementById('premiumOverlay');
     if (overlay && overlay.classList.contains('active')) {
         showPremiumModal({});
@@ -33,9 +34,9 @@ function setPremiumSectionVisible(id, visible) {
     if (el) el.hidden = !visible;
 }
 
-/** Best Journey + Personal Bests: open journeys 1–2; lock from journey 3 unless paid subscription (trial does not exempt). */
+/** Best Journey + Personal Bests: open during trial or paid sub; after trial, lock from journey 3 until subscribed. */
 function shouldLockJourneyGracePremiumFeature() {
-    if (typeof Entitlement !== 'undefined' && Entitlement.isSubscriptionActive()) {
+    if (typeof Entitlement !== 'undefined' && Entitlement.hasPremiumAccess()) {
         return false;
     }
     var attempt = 1;
@@ -242,7 +243,10 @@ function renderPremiumSheet(opts) {
         titleEl.textContent = 'You\'re Premium';
         subEl.textContent = 'Full access is on. Google Play manages your subscription; this app only caches access for offline use.';
         if (trialEl) trialEl.hidden = true;
-        if (laterBtn) laterBtn.textContent = 'Close';
+        if (laterBtn) {
+            laterBtn.hidden = false;
+            laterBtn.textContent = 'Close';
+        }
         if (buyBtn) buyBtn.hidden = true;
         if (restoreBtn) restoreBtn.hidden = true;
     } else if (Entitlement.isTrialActive()) {
@@ -252,14 +256,17 @@ function renderPremiumSheet(opts) {
             trialEl.hidden = false;
             trialEl.textContent = 'Free trial';
         }
-        if (laterBtn) laterBtn.textContent = 'Not now';
+        if (laterBtn) laterBtn.hidden = true;
         if (buyBtn) buyBtn.hidden = false;
         if (restoreBtn) restoreBtn.hidden = false;
     } else {
         titleEl.textContent = 'Your free trial has ended';
         subEl.textContent = 'Keep logging strong days and slips for free — your Journey score is saved. Subscribe whenever you want full features; buying Premium does not reset your progress.';
         if (trialEl) trialEl.hidden = true;
-        if (laterBtn) laterBtn.textContent = 'Continue with basic logging';
+        if (laterBtn) {
+            laterBtn.hidden = false;
+            laterBtn.textContent = 'Continue with basic logging';
+        }
         if (buyBtn) buyBtn.hidden = false;
         if (restoreBtn) restoreBtn.hidden = false;
     }
@@ -272,8 +279,10 @@ function syncPremiumCheckoutState(offer) {
     var buyBtn = document.querySelector('[data-action="premium-checkout"]');
     if (!buyBtn || Entitlement.isSubscriptionActive()) return;
     offer = offer || getPremiumOffer();
+    // Keep tappable so checkout can toast (prices loading / unavailable) — boot ignores disabled clicks.
     var blocked = !offer.plans || !offer.plans.length || offer.source === 'loading';
-    buyBtn.disabled = blocked || playCheckoutInFlight;
+    buyBtn.disabled = !!(typeof revenueCatCheckoutInFlight !== 'undefined' && revenueCatCheckoutInFlight);
+    buyBtn.classList.toggle('is-blocked', blocked);
 }
 
 function planLabel(id) {
@@ -302,11 +311,26 @@ function renderPremiumPlans(offer) {
     if (!plans.length) {
         var statusCopy = offer.source === 'loading'
             ? PREMIUM_PRICE_LOADING
-            : (!usesNativeBillingPricing() ? PREMIUM_PRICE_WEB_HINT : PREMIUM_PRICE_UNAVAILABLE);
+            : (!usesNativeBillingPricing()
+                ? PREMIUM_PRICE_WEB_HINT
+                : (typeof storeBillingUsesRevenueCat === 'function'
+                    && storeBillingUsesRevenueCat()
+                    && typeof PREMIUM_RC_OFFERS_UNAVAILABLE !== 'undefined'
+                    ? PREMIUM_RC_OFFERS_UNAVAILABLE
+                    : PREMIUM_PRICE_UNAVAILABLE));
         var note = Entitlement.isTrialActive()
             ? '<div class="premium-price-note">after ' + offer.trialDays + '-day trial</div>'
             : '';
-        block.innerHTML = '<div class="premium-price-unavailable">' + statusCopy + '</div>' + note;
+        var diag = typeof getNativeBillingDiagnostic === 'function' ? getNativeBillingDiagnostic() : '';
+        var setupSteps = (typeof storeBillingUsesRevenueCat === 'function' && storeBillingUsesRevenueCat()
+            && typeof PREMIUM_RC_SETUP_STEPS !== 'undefined')
+            ? '<div class="premium-price-unavailable premium-rc-setup-steps">' + PREMIUM_RC_SETUP_STEPS + '</div>'
+            : '';
+        var diagBlock = diag
+            ? '<div class="premium-price-unavailable premium-billing-diag">' + diag + '</div>'
+            : '';
+        block.innerHTML = '<div class="premium-price-unavailable">' + statusCopy + '</div>' +
+            diagBlock + setupSteps + note;
         syncPremiumCheckoutState(offer);
         return;
     }
@@ -369,14 +393,25 @@ function showPremiumModal(opts) {
 }
 
 function openPremiumSheet() {
-    if (!isSubscriptionCommerceUiEnabled()) return;
-    if (typeof closeAppSettings === 'function') closeAppSettings();
+    if (!isSubscriptionCommerceUiEnabled()) {
+        showToast(0, 'Subscribe is not available in this app build.');
+        return;
+    }
     var offer = getPremiumOffer();
     showPremiumModal({
         trialDays: offer.trialDays,
         plans: offer.plans,
     });
     loadStoreOffers();
+    // Defer closing settings so the same tap does not fall through the bottom sheet
+    // (Subscribe CTA sits low on screen; center paywall does not cover that touch target).
+    if (typeof closeAppSettings === 'function') {
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                closeAppSettings();
+            });
+        });
+    }
 }
 
 function closePremiumSheet() {
@@ -405,7 +440,7 @@ function startPremiumCheckout() {
         }
         return;
     }
-    if (typeof storeBillingUsesRevenueCat === 'function' && storeBillingUsesRevenueCat()) {
+    if (typeof usesNativeBillingPricing === 'function' && usesNativeBillingPricing()) {
         setCheckoutBusy(true);
         var p = startStoreCheckout(selectedPremiumPlanId);
         if (p && typeof p.then === 'function') {
@@ -415,7 +450,7 @@ function startPremiumCheckout() {
         }
         return;
     }
-    startPremiumCheckoutNativePlay(selectedPremiumPlanId);
+    showToast(0, 'Subscribe and restore work in the King Android app — not in the browser.');
 }
 
 function setCheckoutBusy(busy) {
@@ -432,7 +467,7 @@ function setCheckoutBusy(busy) {
 
 function restorePremiumAccess() {
     if (!isSubscriptionCommerceUiEnabled()) return;
-    if (typeof storeBillingUsesRevenueCat === 'function' && storeBillingUsesRevenueCat()) {
+    if (typeof usesNativeBillingPricing === 'function' && usesNativeBillingPricing()) {
         setRestoreBusy(true);
         var p = restoreStoreAccess();
         if (p && typeof p.then === 'function') {
@@ -442,7 +477,6 @@ function restorePremiumAccess() {
         }
         return;
     }
-    restorePremiumAccessNativePlay();
 }
 
 function setRestoreBusy(busy) {

@@ -20,7 +20,7 @@
 ## What this build is
 
 - Capacitor **Android** wrapper around the King PWA (repo-root HTML/CSS/JS → `www/` + `android/app/src/main/assets/public/` via `npm run web:copy`).
-- **Play billing** (`KingBilling` + `billing-store-play.js`). **This `main` cut:** `KING_SUBSCRIPTION_UI_ENABLED = true`, `KING_USE_REVENUECAT = false`, `KING_FRIENDS_BUILD_FULL_ACCESS = false` — for **Play Internal testing** (subscribe + restore). **Closed-testing friends** should stay on shipped **versionCode 8** (subscribe UI off). RevenueCat prep: `docs/SUBSCRIPTION_REVENUECAT_PREP.md`.
+- **Billing:** **RevenueCat only** (`@revenuecat/purchases-capacitor`, `billing-store-revenuecat.js`). **This `main` cut:** `KING_SUBSCRIPTION_UI_ENABLED = true`, `KING_USE_REVENUECAT = true`, `KING_FRIENDS_BUILD_FULL_ACCESS = false` — for **Play Internal testing** (subscribe + restore). **Closed-testing friends** should stay on shipped **versionCode 8** (subscribe UI off). Setup: `docs/SUBSCRIPTION_REVENUECAT_PREP.md`. Entitlement writes: `billing-entitlement-snapshot.js` (no legacy JS Play purchase path).
 - **Premium trial:** 15 wall days from **`appStartDate`** (not per-journey Day counter). **Best Journey** + **Personal Bests:** open journeys 1–2 after trial; lock from journey 3+ (paid sub unlocks). Personal Bests collapses when journey-grace lock applies.
 - **Settings** (gear): bottom sheet — **How King Builds Will Power**, collapsible **Premium**, daily reminder (`#remindStatus` for native permission/premium copy), export/import, privacy, reset.
 - **Home:** one-time journey metaphor / best-journey hint cards (Journey 1); **strong-day confirm** before 8pm local: early-log card above title (local time + bedtime copy + settings gear → Reminder), hidden if daily reminder is on.

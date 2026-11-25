@@ -2,6 +2,14 @@
 
 King uses **Google Play App Signing**: Google holds the app signing key; you upload AABs signed with your **upload key**. Never commit keystores or `keystore.properties` (see `.gitignore`).
 
+## Java / `JAVA_HOME` (macOS)
+
+Gradle needs a JDK. If `npm run android:bundle` says **Unable to locate a Java Runtime**, you usually have Android Studio but no system JDK. npm scripts use `scripts/with-gradle-java.sh`, which picks up Android Studio’s JBR at `/Applications/Android Studio.app/Contents/jbr/Contents/Home`. You can also add to `~/.zshrc`:
+
+```bash
+export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+```
+
 ## One-time local setup
 
 1. Copy `keystore.properties.example` → `android/keystore.properties` (repo root: `king-nofap-v1.0.1/android/`).

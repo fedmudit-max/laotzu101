@@ -12,6 +12,54 @@
 let storePremiumOffer = null;
 /** Native store path: idle | loading | loaded | unavailable */
 let premiumOfferLoadState = 'idle';
+/** Last billing failure — paywall when source is unavailable (RevenueCat-only when flag on). */
+let lastNativeBillingDiagnostic = '';
+let lastNativeBillingDiagnosticCode = '';
+
+var BILLING_DIAG_CODE = {
+    RC_SDK_UNAVAILABLE: 'RC_SDK_UNAVAILABLE',
+    RC_API_KEY_MISSING: 'RC_API_KEY_MISSING',
+    RC_CONFIGURE_FAILED: 'RC_CONFIGURE_FAILED',
+    RC_GET_OFFERINGS_FAILED: 'RC_GET_OFFERINGS_FAILED',
+    RC_NO_CURRENT_OFFERING: 'RC_NO_CURRENT_OFFERING',
+    RC_OFFERING_NO_PACKAGES: 'RC_OFFERING_NO_PACKAGES',
+    RC_PACKAGES_UNMAPPED: 'RC_PACKAGES_UNMAPPED',
+    RC_PLAY_PRODUCT_UNAVAILABLE: 'RC_PLAY_PRODUCT_UNAVAILABLE',
+};
+
+function billingDiagUserMessage(code) {
+    if (!code) return '';
+    var map = typeof PREMIUM_BILLING_DIAG_USER !== 'undefined' ? PREMIUM_BILLING_DIAG_USER : {};
+    return map[code] || '';
+}
+
+function setNativeBillingFailure(code, technicalDetail) {
+    lastNativeBillingDiagnosticCode = code ? String(code) : '';
+    var user = billingDiagUserMessage(lastNativeBillingDiagnosticCode);
+    if (user) {
+        lastNativeBillingDiagnostic = user;
+    } else if (technicalDetail) {
+        lastNativeBillingDiagnostic = String(technicalDetail);
+    } else {
+        lastNativeBillingDiagnostic = '';
+    }
+    if (typeof logOptionalFailure === 'function' && technicalDetail && technicalDetail !== user) {
+        logOptionalFailure('billing:' + (code || 'unknown'), technicalDetail);
+    }
+}
+
+function getNativeBillingDiagnostic() {
+    return lastNativeBillingDiagnostic || '';
+}
+
+function getNativeBillingDiagnosticCode() {
+    return lastNativeBillingDiagnosticCode || '';
+}
+
+function clearNativeBillingFailure() {
+    lastNativeBillingDiagnostic = '';
+    lastNativeBillingDiagnosticCode = '';
+}
 
 function planDiscountPercent(listAmount, amount) {
     var list = Number(listAmount);
@@ -46,10 +94,7 @@ function formatAmountLike(referencePrice, amount) {
     return value;
 }
 
-/**
- * Annual compare: strikethrough = PREMIUM_ANNUAL_COMPARE_AMOUNT (2299),
- * badge = % off vs the annual sale price.
- */
+/** Annual savings badge only when monthly × 12 and annual prices come from the store (same currency). */
 function showPlanPricesInUi() {
     return typeof KING_SHOW_PLAN_PRICES === 'undefined' || KING_SHOW_PLAN_PRICES === true;
 }
@@ -69,17 +114,32 @@ function stripVisiblePlanPrices(plans) {
 function enrichAnnualSavings(plans) {
     if (!showPlanPricesInUi()) return plans || [];
     var list = plans || [];
+    var monthly = null;
     var annual = null;
     for (var i = 0; i < list.length; i++) {
+        if (list[i].id === 'monthly') monthly = list[i];
         if (list[i].id === 'annual') annual = list[i];
     }
     if (!annual) return list;
 
     var annualAmt = planAmountNumber(annual);
-    var compareAmt = typeof PREMIUM_ANNUAL_COMPARE_AMOUNT === 'number'
-        ? PREMIUM_ANNUAL_COMPARE_AMOUNT
-        : 0;
-    if (!(compareAmt > 0) || !(annualAmt > 0)) return list;
+    if (!(annualAmt > 0)) return list;
+
+    var monthlyAmt = monthly ? planAmountNumber(monthly) : 0;
+    if (!(monthlyAmt > 0)) {
+        delete annual.listPrice;
+        delete annual.listAmount;
+        delete annual.discountPct;
+        return list;
+    }
+
+    var compareAmt = monthlyAmt * 12;
+    if (!(compareAmt > annualAmt)) {
+        delete annual.listPrice;
+        delete annual.listAmount;
+        delete annual.discountPct;
+        return list;
+    }
 
     var pct = planDiscountPercent(compareAmt, annualAmt);
     if (!(pct > 0)) {
@@ -138,10 +198,16 @@ function normalizePremiumPlans(plans, allowMockFallback) {
 }
 
 function usesNativeBillingPricing() {
+    if (typeof storeBillingUsesRevenueCat === 'function' && storeBillingUsesRevenueCat()) {
+        return typeof isKingNativeShell === 'function' && isKingNativeShell();
+    }
+    if (typeof isKingNativeShell === 'function' && isKingNativeShell()) {
+        return true;
+    }
     if (typeof isNativePremiumStoreAvailable === 'function') {
         return isNativePremiumStoreAvailable();
     }
-    return !!getKingBillingPlugin();
+    return false;
 }
 
 /** Dev mock INR plans: local web only (localhost / node tests). Never on GitHub Pages or Android. */
@@ -200,6 +266,7 @@ function getPremiumOffer() {
                 trialDays: PREMIUM_TRIAL_DAYS,
                 plans: [],
                 source: 'unavailable',
+                diagnosticCode: getNativeBillingDiagnosticCode(),
             });
         }
         return withDisplayPlans({

@@ -21,7 +21,7 @@ test('flow: cold start init heals stranded journey from localStorage', () => {
     resetKing(ctx, { today: '2026-06-24' });
     const start = '2026-06-15';
     const dailyLog = {};
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 5; i++) {
         const date = ctx.addDaysToKey(start, i);
         dailyLog[date] = { status: 'slip', day: i + 1, date, slipCount: 1 };
     }
@@ -29,7 +29,7 @@ test('flow: cold start init heals stranded journey from localStorage', () => {
         attempt: 1,
         journeyStartDate: start,
         appStartDate: start,
-        score: { success: 0, failures: 10 },
+        score: { success: 0, failures: 5 },
         pendingNextJourney: false,
         journeyEndedDate: '',
         dailyLog,
@@ -141,20 +141,23 @@ test('flow: multi-day absence auto-strongs through N-2 then allows today', () =>
 
 test('flow: journey end via slips → archive → next journey → log again', () => {
     const ctx = createKingContext();
-    resetKing(ctx, { today: '2026-06-16' });
-    seedJourney(ctx, { today: '2026-06-16', start: '2026-06-15' });
+    const start = '2026-06-15';
+    const end = ctx.addDaysToKey(start, 4);
+    const nextDay = ctx.addDaysToKey(start, 5);
+    resetKing(ctx, { today: nextDay });
+    seedJourney(ctx, { today: nextDay, start });
 
-    for (let i = 0; i < 10; i++) {
-        ctx.applySlipDay({ logDate: '2026-06-15' });
+    for (let i = 0; i < 5; i++) {
+        ctx.applySlipDay({ logDate: ctx.addDaysToKey(start, i) });
     }
-    ctx.archiveCompletedJourney('2026-06-15');
+    ctx.archiveCompletedJourney(end);
 
     assert.equal(ctx.isAwaitingNextJourney(), true);
     assert.equal(ctx.canLogToday(), false);
 
     ctx.beginNextJourney();
     assert.equal(ctx.canLogToday(), true);
-    assert.equal(getState(ctx).journeyStartDate, '2026-06-16');
+    assert.equal(getState(ctx).journeyStartDate, nextDay);
 
     const strong = simulateLogStrongToday(ctx);
     assert.equal(strong.applied, true);
@@ -246,14 +249,17 @@ test('flow: readAppStartWallDate does not persist inferred install date', () => 
 
 test('flow: completeEndJourney path opens next journey when end day has passed', () => {
     const ctx = createKingContext();
-    resetKing(ctx, { today: '2026-06-16' });
-    seedJourney(ctx, { today: '2026-06-16', start: '2026-06-15' });
+    const start = '2026-06-15';
+    const end = ctx.addDaysToKey(start, 4);
+    const nextDay = ctx.addDaysToKey(start, 5);
+    resetKing(ctx, { today: nextDay });
+    seedJourney(ctx, { today: nextDay, start });
 
-    for (let i = 0; i < 10; i++) {
-        ctx.applySlipDay({ logDate: '2026-06-15' });
+    for (let i = 0; i < 5; i++) {
+        ctx.applySlipDay({ logDate: ctx.addDaysToKey(start, i) });
     }
 
-    const comparison = ctx.archiveCompletedJourney('2026-06-15');
+    const comparison = ctx.archiveCompletedJourney(end);
     assert.ok(comparison);
     assert.equal(ctx.canBeginNextJourneyToday(), true);
 

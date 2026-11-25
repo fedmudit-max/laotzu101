@@ -25,6 +25,10 @@ zip -r "$OUT" . \
   -x "android/local.properties" \
   -x "android/app/king-upload.keystore" \
   -x "android/keystore.properties" \
+  -x "constants-revenuecat.local.js" \
+  -x "www/constants-revenuecat.local.js" \
+  -x "android/app/src/main/assets/public/constants-revenuecat.local.js" \
+  -x "ios/App/App/public/constants-revenuecat.local.js" \
   -x "android/app/build/*" \
   -x "android/build/*" \
   -x "android/capacitor-cordova-android-plugins/build/*" \

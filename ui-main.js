@@ -51,7 +51,7 @@ function init() {
     if (ensureTrialStarted(state)) {
         saveToStorage(state);
     }
-    // Corrupt / interrupted 10-slip finish → archive so the user is not stuck.
+    // Corrupt / interrupted 5-slip finish → archive so the user is not stuck.
     if (typeof healStrandedJourneyEnd === 'function') {
         var healedComparison = healStrandedJourneyEnd();
         if (healedComparison) {
@@ -262,7 +262,7 @@ function getScoreCounts() {
     const score = state.score && typeof state.score === 'object'
         ? state.score
         : { success: 0, failures: 0 };
-    const maxFailures = typeof MAX_FAILURES === 'number' ? MAX_FAILURES : 10;
+    const maxFailures = typeof MAX_FAILURES === 'number' ? MAX_FAILURES : 5;
     return {
         success: Math.max(0, Number(score.success) || 0),
         failures: Math.max(0, Math.min(Number(score.failures) || 0, maxFailures)),
@@ -272,10 +272,9 @@ function getScoreCounts() {
 
 function getRelapseScoreTier(failures) {
     if (failures <= 1) return 'relapse-0';
-    if (failures <= 3) return 'relapse-2';
-    if (failures <= 6) return 'relapse-4';
-    if (failures <= 8) return 'relapse-7';
-    if (failures === 9) return 'relapse-9';
+    if (failures === 2) return 'relapse-2';
+    if (failures === 3) return 'relapse-4';
+    if (failures === 4) return 'relapse-9';
     return 'relapse-10';
 }
 

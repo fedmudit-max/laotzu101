@@ -67,9 +67,9 @@ function runStateMigrations(merged, saved) {
     }
     delete merged.devDateOffset;
 
-    // Paid window only from Play client purchase/restore — not URL or local “success”.
+    // Paid cache only from store billing writes (Play, restore, RevenueCat) — not URL or dev “success”.
     var paidSource = merged.source;
-    if (paidSource !== 'play' && paidSource !== 'restore') {
+    if (paidSource !== 'play' && paidSource !== 'restore' && paidSource !== 'revenuecat') {
         merged.premiumUntil = '';
         if (paidSource !== 'local-trial') merged.source = '';
     }
